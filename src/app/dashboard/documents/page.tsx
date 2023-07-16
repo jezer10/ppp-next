@@ -4,6 +4,8 @@
 import preview_document from '@public/preview_document.png';
 import document_logo from '@public/document_logo.svg';
 import upload_cloud from '@public/upload_cloud.svg';
+import loader_icon from '@public/loader.svg';
+
 import { Menu, Transition, Switch, Dialog } from '@headlessui/react';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import {
@@ -77,9 +79,16 @@ export default function Documents() {
   return (
     <>
       {isOpen && (
-        <div className="bg-black/50 overflow-y-auto absolute inset-0 h-full z-20   flex  justify-center">
-          <div className="max-w-xl w-full py-4">
-            <div className="bg-white  relative  rounded-lg shadow text-[#757575]  p-8 h-auto">
+        <div className="bg-black/50 overflow-y-auto absolute inset-0 h-full z-20 flex  justify-center">
+          <div className="max-w-xl w-full   rounded-lg ">
+            <div className="bg-white  relative rounded-lg overflow-hidden  shadow text-[#757575]  p-8 h-auto">
+              <div className="hidden inset-0 absolute bg-white h-full z-40 w-full flex items-center justify-center">
+                <Image
+                  src={loader_icon}
+                  alt="loader"
+                  className="animate-spin"
+                />
+              </div>
               <button
                 className="w-6 h-6 absolute right-2 top-2"
                 onClick={closeModal}
