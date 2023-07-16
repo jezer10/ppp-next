@@ -72,7 +72,7 @@ export default function SideBar() {
               <div className="font-thin">Coordinador de PPP</div>
             </div>
           </div>
-          <div className="w-8 h-8 hover:bg-[#FF9853] hover:text-white rounded-full p-1">
+          <div className="w-8 h-8 hover:bg-[#FF9853] hover:text-white rounded-full p-1 cursor-pointer">
             <ArrowLeftOnRectangleIcon />
           </div>
         </div>
