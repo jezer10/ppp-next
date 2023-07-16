@@ -1,0 +1,4 @@
+.flagg {
+  @apply w-full h-24;
+  clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 0% 80%);
+}
