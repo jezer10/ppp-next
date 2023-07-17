@@ -24,7 +24,8 @@ const documentList = [
 ];
 
 export default function Documents() {
-  let [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
@@ -82,13 +83,15 @@ export default function Documents() {
         <div className="bg-black/50 overflow-y-auto absolute inset-0 h-full z-20 flex  justify-center">
           <div className="max-w-xl w-full   rounded-lg ">
             <div className="bg-white  relative rounded-lg overflow-hidden  shadow text-[#757575]  p-8 h-auto">
-              <div className="hidden inset-0 absolute bg-white h-full z-40 w-full flex items-center justify-center">
-                <Image
-                  src={loader_icon}
-                  alt="loader"
-                  className="animate-spin"
-                />
-              </div>
+              {isSaving && (
+                <div className=" inset-0 absolute bg-white h-full z-40 w-full flex items-center justify-center">
+                  <Image
+                    src={loader_icon}
+                    alt="loader"
+                    className="animate-spin"
+                  />
+                </div>
+              )}
               <button
                 className="w-6 h-6 absolute right-2 top-2"
                 onClick={closeModal}
