@@ -9,7 +9,10 @@ import {
   XMarkIcon,
   LockClosedIcon,
 } from '@heroicons/react/24/solid';
+
+
 import { useState } from 'react';
+
 const Home = () => {
   const [isValid, setValid] = useState(false);
 
@@ -19,12 +22,13 @@ const Home = () => {
       <Image
         src={log_grp}
         alt="logo grupal"
-        className="h-full absolute right-28 -z-10"
+        priority={true}
+        className="h-full w-auto absolute right-28 -z-10"
       />
       <div className="flex gap-4">
         <div className="w-56 h-full">
           <div className="px-12 py-8">
-            <Image src={log_sis} alt="logo sistemas" className="w-full" />
+            <Image src={log_sis} alt="logo sistemas" className="w-auto h-auto" />
           </div>
           <div className="flex flex-col gap-32">
             <div className="relative">
@@ -59,7 +63,7 @@ const Home = () => {
         </div>
       </div>
 
-      <div className='h-full w-1/2 absolute right-0 top-0 bottom-0 flex items-center justify-center'>
+      <div className="h-full w-1/2 absolute right-0 top-0 bottom-0 flex items-center justify-center">
         <div className="max-w-xs flex flex-col gap-4">
           <div className="text-[#0F3971]  text-center ">
             <div className="font-bold text-2xl">Iniciar Sesión</div>
