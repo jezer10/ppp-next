@@ -16,7 +16,7 @@ export default function DashboardLayout({
     <div className="h-screen flex items-stretch">
       <SideBar />
       <main className=" w-full h-full p-4 flex flex-col gap-4 relative overflow-y-auto">
-        <div className="bg-gray-100 w-full h-full absolute inset-0 -z-10"></div>
+        <div className="bg-[#EEE] w-full h-full absolute inset-0 -z-10" />
         <header className="flex items-center justify-between">
           <div className="text-[#757575]">
             <div className="font-bold text-2xl">Inicio</div>

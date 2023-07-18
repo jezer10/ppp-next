@@ -1,5 +1,6 @@
 import { siteConfig } from '@/config/site';
-import './globals.css';
+import '@/styles/globals.css';
+import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import { env } from 'process';
@@ -29,9 +30,11 @@ interface RootLayoutProps {
 }
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
+ <ClerkProvider>
+     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={inter.className}>{children}</body>
     </html>
+ </ClerkProvider>
   );
 }
