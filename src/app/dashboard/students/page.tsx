@@ -28,13 +28,20 @@ interface Student {
     status: number;
   }[];
 }
-export default async function Students() {
-  const studentMock: Student[] = await (
-    await fetch('/api/students', {
-      method: 'GET',
-    })
-  ).json();
-  const [studentList, setStudentList] = useState(studentMock);
+export default function Students() {
+  const [studentList, setStudentList] = useState([] as Student[]);
+
+  useEffect(() => {
+    async function mock() {
+      const studentMock: Student[] = await (
+        await fetch('/api/students', {
+          method: 'GET',
+        })
+      ).json();
+      setStudentList(studentMock);
+    }
+    mock();
+  });
 
   const studentOptionItems = [
     {
