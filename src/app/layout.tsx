@@ -1,9 +1,7 @@
 import { siteConfig } from '@/config/site';
 import '@/styles/globals.css';
-import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
-import { env } from 'process';
 
 const inter = Roboto({
   weight: ['100', '300', '400', '500', '700', '900'],
@@ -11,7 +9,7 @@ const inter = Roboto({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL ?? ''),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? ''),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
@@ -30,11 +28,9 @@ interface RootLayoutProps {
 }
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
- <ClerkProvider>
-     <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head />
       <body className={inter.className}>{children}</body>
     </html>
- </ClerkProvider>
   );
 }

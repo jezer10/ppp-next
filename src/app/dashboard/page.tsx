@@ -37,7 +37,7 @@ export default function Dashboard() {
             className={` h-2 rounded-full  ${
               e == 2 ? 'w-6 bg-[#8F8F8F]' : 'w-2 bg-[#C2C2C2]'
             }`}
-          ></div>
+          />
         ))}
       </div>
       <div className="h-full  w-full grid grid-cols-3 gap-12 text-white font-bold">
