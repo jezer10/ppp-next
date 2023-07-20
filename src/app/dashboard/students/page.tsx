@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   MagnifyingGlassIcon,
@@ -12,11 +12,11 @@ import {
   UserGroupIcon,
   TrashIcon,
   EyeIcon,
-} from '@heroicons/react/20/solid';
-import { Menu, Transition } from '@headlessui/react';
-import { Fragment, useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-
+} from "@heroicons/react/20/solid";
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import useSWR from "swr";
 interface Student {
   id: number;
   code: number;
@@ -29,50 +29,42 @@ interface Student {
   }[];
 }
 export default function Students() {
-  const [studentList, setStudentList] = useState([] as Student[]);
-
-  useEffect(() => {
-    async function mock() {
-      const studentMock: Student[] = await (
-        await fetch('/api/students', {
-          method: 'GET',
-        })
-      ).json();
-      setStudentList(studentMock);
-    }
-    mock();
-  });
+  const { data: studentMock = [], error } = useSWR<Student[]>(
+    "/api/students",
+    {},
+  );
+  const [studentList, setStudentList] = useState(studentMock);
 
   const studentOptionItems = [
     {
       icon: IdentificationIcon,
-      name: 'Info Estudiante',
+      name: "Info Estudiante",
       actionFunction: (idx: number) => {
         setStudentList((prevStudentList) => {
           const closedItems = prevStudentList.map((e) => ({
             ...e,
             show: false,
           }));
-          closedItems[idx]['show'] = true;
+          closedItems[idx]["show"] = true;
           return closedItems;
         });
       },
     },
-    { icon: ArrowTrendingUpIcon, name: 'Estado', actionFunction: () => {} },
-    { icon: DocumentIcon, name: 'Documentos', actionFunction: () => {} },
+    { icon: ArrowTrendingUpIcon, name: "Estado", actionFunction: () => {} },
+    { icon: DocumentIcon, name: "Documentos", actionFunction: () => {} },
     {
       icon: UserGroupIcon,
-      name: 'Cambiar Supervisor',
+      name: "Cambiar Supervisor",
       actionFunction: () => {},
     },
-    { icon: TrashIcon, name: 'Eliminar', actionFunction: () => {} },
+    { icon: TrashIcon, name: "Eliminar", actionFunction: () => {} },
   ];
 
   function StudentOptions(props: any) {
     return (
       <Menu as="div" className="relative inline-block text-left">
         <div>
-          <Menu.Button className=" flex items-center gap-2 text-[#757575] bg-[#EAEAEA] w-full justify-center rounded-md  px-2 py-1 text-[0.625rem]    focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+          <Menu.Button className=" flex w-full items-center justify-center gap-2 rounded-md bg-[#EAEAEA] px-2  py-1 text-[0.625rem] text-[#757575]    focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
             Opciones
             <ChevronDownIcon className="  w-[0.5625rem] " aria-hidden="true" />
           </Menu.Button>
@@ -86,7 +78,7 @@ export default function Students() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute right-0 mt-2 z-10 w-32 overflow-hidden origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {studentOptionItems.map(
               ({ name, actionFunction, icon: Icon }, idx) => (
                 <Menu.Item key={idx}>
@@ -94,8 +86,8 @@ export default function Students() {
                     <button
                       onClick={() => actionFunction(props.itemIndex)}
                       className={`${
-                        active && 'bg-[#EEEEEE]'
-                      } flex w-full items-center gap-2 text-[0.5rem] py-1 px-2 whitespace-nowrap text-[#757575]`}
+                        active && "bg-[#EEEEEE]"
+                      } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
                     >
                       <Icon className="w-[0.75rem]" />
                       {name}
@@ -111,24 +103,24 @@ export default function Students() {
   }
 
   return (
-    <div className="h-full flex flex-col gap-8">
-      <div className="flex justify-end gap-4 items-stretch">
-        <div className="flex rounded-lg overflow-hidden ">
+    <div className="flex h-full flex-col gap-8">
+      <div className="flex items-stretch justify-end gap-4">
+        <div className="flex overflow-hidden rounded-lg ">
           <input
             type="text"
-            className=" px-4 py-2 placeholder:text-[#C4C4C4] placeholder:text-sm placeholder:font-light focus:outline-none"
+            className=" px-4 py-2 placeholder:text-sm placeholder:font-light placeholder:text-[#C4C4C4] focus:outline-none"
             placeholder="Buscar..."
           />
-          <button className="text-white h-full px-4 bg-[#FF9853] ">
-            <MagnifyingGlassIcon className="w-4 h-4" />
+          <button className="h-full bg-[#FF9853] px-4 text-white ">
+            <MagnifyingGlassIcon className="h-4 w-4" />
           </button>
         </div>
-        <button className="min-h-full px-4 bg-[#FF9853] rounded-lg text-white">
-          <FunnelIcon className="w-4 h-4" />
+        <button className="min-h-full rounded-lg bg-[#FF9853] px-4 text-white">
+          <FunnelIcon className="h-4 w-4" />
         </button>
       </div>
-      <div className="overflow-x-auto flex flex-col gap-4">
-        <div className="bg-white px-4 py-3 text-left text-[0.6875rem] text-[#757575] font-medium rounded-[0.625rem] grid grid-cols-8">
+      <div className="flex flex-col gap-4 overflow-x-auto">
+        <div className="grid grid-cols-8 rounded-[0.625rem] bg-white items-center px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
           <div>Código</div>
           <div>Nombre Completo</div>
           <div>E.P.</div>
@@ -141,7 +133,7 @@ export default function Students() {
 
         {studentList.map((student, studentIndex) => (
           <div key={studentIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
-            <div className="bg-white shadow-red-700 shadow px-4 py-6 text-left text-[0.625rem] rounded-[0.625rem] text-[#C4C4C4] font-normal grid grid-cols-8 items-center">
+            <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow shadow-red-700">
               <div>{student.code}</div>
               <div>{student.fullName}</div>
               <div>E.P.</div>
@@ -154,22 +146,22 @@ export default function Students() {
               </div>
             </div>
             {student.show && (
-              <div className="flex p-4 gap-4  items-center rounded-b-lg">
+              <div className="flex items-center gap-4  rounded-b-lg p-4">
                 {student.documents.map((document, documentIndex) => (
                   <div
                     key={documentIndex}
-                    className="rounded-[0.625rem] px-4 py-3 text-white bg-[#55E38E] flex items-center gap-2"
+                    className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
                   >
-                    <PDFIcon className=" flex-none w-6 h-6" />
+                    <PDFIcon className=" h-6 w-6 flex-none" />
                     <div>
-                      <div className="font-bold text-[0.625rem] whitespace-nowrap">
+                      <div className="whitespace-nowrap text-[0.625rem] font-bold">
                         {document.name}
                       </div>
-                      <div className="font-light text-[0.4375rem]">
+                      <div className="text-[0.4375rem] font-light">
                         Validado
                       </div>
                     </div>
-                    <button className="w-6 h-6 p-1 rounded-lg hover:bg-white/20">
+                    <button className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
                       <EyeIcon />
                     </button>
                   </div>
@@ -179,25 +171,25 @@ export default function Students() {
           </div>
         ))}
       </div>
-      <div className="flex justify-between items-center">
-        <div className="text-[#757575] text-[0.625rem]">1 - 4 de 54</div>
-        <div className="flex gap-2 items-center">
-          <button className="w-[1.5rem] h-[1.5rem] p-0.5 text-[#FF9853]">
+      <div className="flex items-center justify-between">
+        <div className="text-[0.625rem] text-[#757575]">1 - 4 de 54</div>
+        <div className="flex items-center gap-2">
+          <button className="h-[1.5rem] w-[1.5rem] p-0.5 text-[#FF9853]">
             <ChevronLeftIcon />
           </button>
           <div className="flex items-center ">
             {[1, 2, 3].map((e, ind) => (
               <button
                 key={ind}
-                className={`w-[1.5rem] h-[1.5rem] rounded-[0.3125rem]   text-[0.625rem] ${
-                  ind == 0 ? 'bg-[#FF9853] text-white' : 'text-[#757575]'
+                className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem]   text-[0.625rem] ${
+                  ind == 0 ? "bg-[#FF9853] text-white" : "text-[#757575]"
                 }`}
               >
                 {e}
               </button>
             ))}
           </div>
-          <button className="w-[1.5rem] h-[1.5rem] p-0.5 text-[#FF9853]">
+          <button className="h-[1.5rem] w-[1.5rem] p-0.5 text-[#FF9853]">
             <ChevronRightIcon />
           </button>
         </div>
