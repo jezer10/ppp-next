@@ -22,6 +22,5 @@ export async function GET(req: Request): Promise<any> {
       },
     ],
   }));
-  console.log(fakeMockedRequests);
   return fakeMockedRequests;
 }
