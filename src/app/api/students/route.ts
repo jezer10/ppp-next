@@ -1,12 +1,16 @@
 import { faker } from "@faker-js/faker";
+import { NextResponse } from "next/server";
 
-export async function GET(req: Request): Promise<any> {
-  const fakeMockedRequests = Array.from({ length: 4 }, (_, idx) => ({
+export async function GET(req: Request) {
+  const data = Array.from({ length: 4 }, (_, idx) => ({
     id: idx + 1,
     code: 201910523,
     fullName: faker.person.fullName(),
     cycle: faker.helpers.arrayElement(["VI", "VII", "VIII", "IX", "X"]),
     show: false,
+    status: faker.helpers.arrayElement([0, 1, 2, 3]),
+    jobTitle: faker.person.jobTitle(),
+    supervisor: faker.person.fullName(),
     documents: [
       {
         name: "Carta de presentación",
@@ -22,5 +26,5 @@ export async function GET(req: Request): Promise<any> {
       },
     ],
   }));
-  return fakeMockedRequests;
+  return NextResponse.json(data);
 }

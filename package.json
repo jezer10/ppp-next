@@ -14,17 +14,21 @@
     "db:seed": "npx dotenv -e .env.local -- prisma db seed",
     "prisma:generate": "npx dotenv -e .env.local -- prisma generate",
     "prisma:studio": "npx dotenv -e .env.local -- prisma studio",
-    "production:build": "npx prisma generate && npx prisma migrate deploy && next build"
+    "production:build": "npx prisma generate && npx prisma migrate deploy && next build",
+    "postinstall": "npm run download-webviewer",
+    "download-webviewer": "npx @pdftron/webviewer-downloader --webviewerLocation ./public/webviewer/lib"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.22.0",
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
+    "@pdftron/webviewer": "^10.3.0",
     "@prisma/client": "^5.0.0",
     "eslint-config-next": "^13.4.10",
     "next": "^13.4.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-pdf": "^7.3.3",
     "swr": "^2.2.0"
   },
   "devDependencies": {

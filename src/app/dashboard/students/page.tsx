@@ -1,4 +1,5 @@
 "use client";
+import { Document, Page } from "react-pdf";
 
 import {
   MagnifyingGlassIcon,
@@ -12,6 +13,8 @@ import {
   UserGroupIcon,
   TrashIcon,
   EyeIcon,
+  UserIcon,
+  ClockIcon,
 } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -23,18 +26,26 @@ interface Student {
   fullName: string;
   cycle: string;
   show: boolean;
+  status: number;
+  jobTitle: string;
+  supervisor: string;
   documents: {
     name: string;
     status: number;
   }[];
 }
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+};
 export default function Students() {
-  const { data: studentMock = [], error } = useSWR<Student[]>(
-    "/api/students",
-    {},
-  );
-  const [studentList, setStudentList] = useState(studentMock);
+  const [studentList, setStudentList] = useState<Student[]>([]);
 
+  const { data = [], error } = useSWR<Student[]>("/api/students", fetcher);
+  useEffect(() => {
+    if (data) setStudentList(data);
+  }, [data]);
   const studentOptionItems = [
     {
       icon: IdentificationIcon,
@@ -101,100 +112,143 @@ export default function Students() {
       </Menu>
     );
   }
+  function StudentDocumentPreview() {
+    return (
+      <div>
+        <Document file={"http://infolab.stanford.edu/pub/papers/google.pdf"}>
+          <Page pageNumber={1} />
+        </Document>
+      </div>
+    );
+  }
+
+  function StudentStatusFlag({ status }: { status: number }) {
+    return (
+      <span
+        className={`rounded px-2 py-0.5  text-white ${
+          status === 0
+            ? "bg-[#29EB77]"
+            : status === 1
+            ? "bg-[#FFC700]"
+            : status === 2
+            ? "bg-[#FC6767]"
+            : "bg-[#49D3FE]"
+        }`}
+      >
+        {status === 0
+          ? "En prácticas"
+          : status === 1
+          ? "Pendiente"
+          : status === 2
+          ? "Sin Confirmar"
+          : "Finalizado"}
+      </span>
+    );
+  }
 
   return (
-    <div className="flex h-full flex-col gap-8">
-      <div className="flex items-stretch justify-end gap-4">
-        <div className="flex overflow-hidden rounded-lg ">
-          <input
-            type="text"
-            className=" px-4 py-2 placeholder:text-sm placeholder:font-light placeholder:text-[#C4C4C4] focus:outline-none"
-            placeholder="Buscar..."
-          />
-          <button className="h-full bg-[#FF9853] px-4 text-white ">
-            <MagnifyingGlassIcon className="h-4 w-4" />
+    <>
+      {" "}
+      <StudentDocumentPreview />
+      <div className="flex h-full flex-col gap-8">
+        <div className="flex items-stretch justify-end gap-4">
+          <div className="flex overflow-hidden rounded-lg ">
+            <input
+              type="text"
+              className=" px-4 py-2 placeholder:text-sm placeholder:font-light placeholder:text-[#C4C4C4] focus:outline-none"
+              placeholder="Buscar..."
+            />
+            <button className="h-full bg-[#FF9853] px-4 text-white ">
+              <MagnifyingGlassIcon className="h-4 w-4" />
+            </button>
+          </div>
+          <button className="min-h-full rounded-lg bg-[#FF9853] px-4 text-white">
+            <FunnelIcon className="h-4 w-4" />
           </button>
         </div>
-        <button className="min-h-full rounded-lg bg-[#FF9853] px-4 text-white">
-          <FunnelIcon className="h-4 w-4" />
-        </button>
-      </div>
-      <div className="flex flex-col gap-4 overflow-x-auto">
-        <div className="grid grid-cols-8 rounded-[0.625rem] bg-white items-center px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
-          <div>Código</div>
-          <div>Nombre Completo</div>
-          <div>E.P.</div>
-          <div>Ciclo</div>
-          <div>Estado</div>
-          <div>Supervisor</div>
-          <div>Tiempo</div>
-          <div>Opciones</div>
-        </div>
+        <div className="flex flex-col gap-4 ">
+          <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
+            <div>Código</div>
+            <div>Nombre Completo</div>
+            <div>E.P.</div>
+            <div>Ciclo</div>
+            <div>Estado</div>
+            <div>Supervisor</div>
+            <div>Tiempo</div>
+            <div>Opciones</div>
+          </div>
 
-        {studentList.map((student, studentIndex) => (
-          <div key={studentIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
-            <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow shadow-red-700">
-              <div>{student.code}</div>
-              <div>{student.fullName}</div>
-              <div>E.P.</div>
-              <div>{student.cycle}</div>
-              <div>Estado</div>
-              <div>Supervisor</div>
-              <div>Tiempo</div>
-              <div className="rounded-r-lg">
-                <StudentOptions itemIndex={studentIndex} />
+          {studentList.map((student, studentIndex) => (
+            <div key={studentIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
+              <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                <div>{student.code}</div>
+                <div>{student.fullName}</div>
+                <div>{student.jobTitle}</div>
+                <div>{student.cycle}</div>
+                <div>
+                  <StudentStatusFlag status={student.status} />
+                </div>
+                <div className="flex items-center gap-2">
+                  <UserIcon className="h-4 w-4" /> {student.supervisor}
+                </div>
+                <div className="flex items-center gap-2">
+                  <ClockIcon className="h-4 w-4" /> 4M
+                </div>
+                <div className="rounded-r-lg">
+                  <StudentOptions itemIndex={studentIndex} />
+                </div>
               </div>
-            </div>
-            {student.show && (
-              <div className="flex items-center gap-4  rounded-b-lg p-4">
-                {student.documents.map((document, documentIndex) => (
-                  <div
-                    key={documentIndex}
-                    className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
-                  >
-                    <PDFIcon className=" h-6 w-6 flex-none" />
-                    <div>
-                      <div className="whitespace-nowrap text-[0.625rem] font-bold">
-                        {document.name}
+              {student.show && (
+                <div className="flex items-center gap-4  rounded-b-lg p-4">
+                  {student.documents.map((document, documentIndex) => (
+                    <div
+                      key={documentIndex}
+                      className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
+                    >
+                      <PDFIcon className=" h-6 w-6 flex-none" />
+                      <div>
+                        <div className="whitespace-nowrap text-[0.625rem] font-bold">
+                          {document.name}
+                        </div>
+                        <div className="text-[0.4375rem] font-light">
+                          Validado
+                        </div>
                       </div>
-                      <div className="text-[0.4375rem] font-light">
-                        Validado
-                      </div>
+                      <button className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
+                        <EyeIcon />
+                      </button>
                     </div>
-                    <button className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
-                      <EyeIcon />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="text-[0.625rem] text-[#757575]">1 - 4 de 54</div>
+          <div className="flex items-center gap-2">
+            <button className="h-[1.5rem] w-[1.5rem] p-0.5 text-[#FF9853]">
+              <ChevronLeftIcon />
+            </button>
+            <div className="flex items-center ">
+              {[1, 2, 3].map((e, ind) => (
+                <button
+                  key={ind}
+                  className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem]   text-[0.625rem] ${
+                    ind == 0 ? "bg-[#FF9853] text-white" : "text-[#757575]"
+                  }`}
+                >
+                  {e}
+                </button>
+              ))}
+            </div>
+            <button className="h-[1.5rem] w-[1.5rem] p-0.5 text-[#FF9853]">
+              <ChevronRightIcon />
+            </button>
           </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="text-[0.625rem] text-[#757575]">1 - 4 de 54</div>
-        <div className="flex items-center gap-2">
-          <button className="h-[1.5rem] w-[1.5rem] p-0.5 text-[#FF9853]">
-            <ChevronLeftIcon />
-          </button>
-          <div className="flex items-center ">
-            {[1, 2, 3].map((e, ind) => (
-              <button
-                key={ind}
-                className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem]   text-[0.625rem] ${
-                  ind == 0 ? "bg-[#FF9853] text-white" : "text-[#757575]"
-                }`}
-              >
-                {e}
-              </button>
-            ))}
-          </div>
-          <button className="h-[1.5rem] w-[1.5rem] p-0.5 text-[#FF9853]">
-            <ChevronRightIcon />
-          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
