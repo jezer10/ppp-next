@@ -115,9 +115,9 @@ export default function Students() {
   function StudentDocumentPreview() {
     return (
       <div>
-        <Document file={"http://infolab.stanford.edu/pub/papers/google.pdf"}>
+        {/* <Document file={"http://infolab.stanford.edu/pub/papers/google.pdf"}>
           <Page pageNumber={1} />
-        </Document>
+        </Document> */}
       </div>
     );
   }

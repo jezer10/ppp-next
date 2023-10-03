@@ -9,21 +9,21 @@ const roboto = Roboto({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? ""),
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  keywords: ["Educational"],
-  authors: [
-    {
-      name: "Mijail Palomino",
-    },
-  ],
-  creator: "Mijail Palomino",
-};
+// export const metadata: Metadata = {
+//   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? ""),
+//   title: {
+//     default: siteConfig.name,
+//     template: `%s | ${siteConfig.name}`,
+//   },
+//   description: siteConfig.description,
+//   keywords: ["Educational"],
+//   authors: [
+//     {
+//       name: "Mijail Palomino",
+//     },
+//   ],
+//   creator: "Mijail Palomino",
+// };
 interface RootLayoutProps {
   children: React.ReactNode;
 }
