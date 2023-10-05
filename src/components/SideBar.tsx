@@ -12,7 +12,7 @@ const menuItems = [
   { id: 2, name: 'Documentos PPP', path: '/documents' },
   { id: 3, name: 'Estudiantes', path: '/students' },
   { id: 4, name: 'Supervisores', path: '/supervisors' },
-  { id: 5, name: 'Solicitudes', path: '/requests' },
+  { id: 5, name: 'Solicitudes', path: '/requestsn' },
   { id: 6, name: 'Test', path: '/tests' },
   { id: 7, name: 'Configuración', path: '/settings' },
 ];
