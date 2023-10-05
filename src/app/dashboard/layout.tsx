@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 
 import "./dashboard.css";
@@ -6,12 +7,15 @@ import SideBar from "@/components/SideBar";
 import { BellIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 
 import { GlobeAltIcon } from "@heroicons/react/24/outline";
+import { getSession, useSession } from "next-auth/react";
+import { useInformation } from "@/lib/hooks/useInformation";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user_data } = useInformation();
   return (
     <div className="flex h-screen items-stretch">
       <SideBar />
@@ -21,7 +25,10 @@ export default function DashboardLayout({
           <div className="text-[#757575]">
             <div className="text-2xl font-bold">Inicio</div>
             <div className="text-sm">
-              Bienvenido, <span className="font-bold">David Reyna</span>
+              Bienvenido,{" "}
+              <span className="font-bold">
+                {user_data[0].name + " " + user_data[0].surname}
+              </span>
             </div>
           </div>
           <div className="flex gap-3 rounded-lg bg-[#FF9853] px-4 py-3 text-white">
