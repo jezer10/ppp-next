@@ -9,12 +9,13 @@ import profile_pic from '../../public/dreyna.jpg';
 import { HomeIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/solid';
 const menuItems = [
   { id: 1, name: 'Inicio', path: '' },
-  { id: 2, name: 'Documentos PPP', path: '/documents' },
-  { id: 3, name: 'Estudiantes', path: '/students' },
-  { id: 4, name: 'Supervisores', path: '/supervisors' },
-  { id: 5, name: 'Solicitudes', path: '/requests' },
-  { id: 6, name: 'Test', path: '/tests' },
-  { id: 7, name: 'Configuración', path: '/settings' },
+  { id: 2, name: 'Proceso PPP', path: '/procesoPPP' },
+  { id: 3, name: 'Documentos PPP', path: '/documents' },
+  { id: 4, name: 'Estudiantes', path: '/students' },
+  { id: 5, name: 'Supervisores', path: '/supervisors' },
+  { id: 6, name: 'Solicitudes', path: '/requests' },
+  { id: 7, name: 'Test', path: '/tests' },
+  { id: 8, name: 'Configuración', path: '/settings' },
 ];
 export default function SideBar() {
   const pathname = usePathname();

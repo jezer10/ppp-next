@@ -20,7 +20,7 @@ import Image from 'next/image';
 
 const documentList = [
   { id: 1, name: 'Ficha de evaluación tutor empresarial', enabled: false },
-  { id: 2, name: 'Ficha de evaluación tutor academico', enabled: true },
+  { id: 2,name : 'Ficha de evaluación tutor academico', enabled: true },
 ];
 
 export default function Documents() {
