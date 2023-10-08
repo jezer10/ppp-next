@@ -20,32 +20,23 @@ import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import useSWR from "swr";
-interface Student {
-  id: number;
-  code: number;
-  fullName: string;
-  cycle: string;
-  show: boolean;
-  status: number;
-  jobTitle: string;
-  supervisor: string;
-  documents: {
-    name: string;
-    status: number;
-  }[];
-}
+import { IApiResponse, IEtapa, IStudent } from "./interfaces/student";
+import { intToRoman } from "@/utils/romanConverter";
+
 const fetcher = async (url: string) => {
   const response = await fetch(url);
   const data = await response.json();
   return data;
 };
 export default function Students() {
-  const [studentList, setStudentList] = useState<Student[]>([]);
 
-  const { data = [], error } = useSWR<Student[]>("/api/students", fetcher);
+  const [studentList, setStudentList] = useState<IStudent[]>([]);
+  const { data = null, error } = useSWR<IApiResponse<IStudent[]>>("http://localhost:4000/student", fetcher);
+
   useEffect(() => {
-    if (data) setStudentList(data);
+    if (data) setStudentList(data.info);
   }, [data]);
+
   const studentOptionItems = [
     {
       icon: IdentificationIcon,
@@ -61,14 +52,14 @@ export default function Students() {
         });
       },
     },
-    { icon: ArrowTrendingUpIcon, name: "Estado", actionFunction: () => {} },
-    { icon: DocumentIcon, name: "Documentos", actionFunction: () => {} },
+    { icon: ArrowTrendingUpIcon, name: "Estado", actionFunction: () => { } },
+    { icon: DocumentIcon, name: "Documentos", actionFunction: () => { } },
     {
       icon: UserGroupIcon,
       name: "Cambiar Supervisor",
-      actionFunction: () => {},
+      actionFunction: () => { },
     },
-    { icon: TrashIcon, name: "Eliminar", actionFunction: () => {} },
+    { icon: TrashIcon, name: "Eliminar", actionFunction: () => { } },
   ];
 
   function StudentOptions(props: any) {
@@ -77,7 +68,7 @@ export default function Students() {
         <div>
           <Menu.Button className=" flex w-full items-center justify-center gap-2 rounded-md bg-[#EAEAEA] px-2  py-1 text-[0.625rem] text-[#757575]    focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
             Opciones
-            <ChevronDownIcon className="  w-[0.5625rem] " aria-hidden="true" />
+            <ChevronDownIcon className="  w-[1rem] " aria-hidden="true" />
           </Menu.Button>
         </div>
         <Transition
@@ -96,9 +87,8 @@ export default function Students() {
                   {({ active }) => (
                     <button
                       onClick={() => actionFunction(props.itemIndex)}
-                      className={`${
-                        active && "bg-[#EEEEEE]"
-                      } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
+                      className={`${active && "bg-[#EEEEEE]"
+                        } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
                     >
                       <Icon className="w-[0.75rem]" />
                       {name}
@@ -112,6 +102,7 @@ export default function Students() {
       </Menu>
     );
   }
+
   function StudentDocumentPreview() {
     return (
       <div>
@@ -125,30 +116,66 @@ export default function Students() {
   function StudentStatusFlag({ status }: { status: number }) {
     return (
       <span
-        className={`rounded px-2 py-0.5  text-white ${
-          status === 0
-            ? "bg-[#29EB77]"
-            : status === 1
+        className={`rounded px-2 py-0.5  text-white ${status === 0
+          ? "bg-[#29EB77]"
+          : status === 1
             ? "bg-[#FFC700]"
             : status === 2
-            ? "bg-[#FC6767]"
-            : "bg-[#49D3FE]"
-        }`}
+              ? "bg-[#FC6767]"
+              : "bg-[#49D3FE]"
+          }`}
       >
         {status === 0
           ? "En prácticas"
           : status === 1
-          ? "Pendiente"
-          : status === 2
-          ? "Sin Confirmar"
-          : "Finalizado"}
+            ? "Pendiente"
+            : status === 2
+              ? "Sin Confirmar"
+              : "Finalizado"}
       </span>
     );
   }
 
+  /* Pagination */
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(4);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filtra los datos según el término de búsqueda
+  const filteredData = studentList.filter(item =>
+    item.Persona.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Calcula las páginas totales
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  // Filtra los datos en función de la página actual
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = filteredData.slice(startIndex, endIndex);
+
+  // Cambia de página
+  const handlePageChange = (page: any) => {
+    setCurrentPage(page);
+  };
+
+  // Cambia de página hacia atrás
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Cambia de página hacia adelante
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   return (
     <>
-      {" "}
       <StudentDocumentPreview />
       <div className="flex h-full flex-col gap-8">
         <div className="flex items-stretch justify-end gap-4">
@@ -178,18 +205,18 @@ export default function Students() {
             <div>Opciones</div>
           </div>
 
-          {studentList.map((student, studentIndex) => (
+          {currentData.map((student, studentIndex) => (
             <div key={studentIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
               <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
                 <div>{student.code}</div>
-                <div>{student.fullName}</div>
-                <div>{student.jobTitle}</div>
-                <div>{student.cycle}</div>
+                <div>{student.Persona.name + " " + student.Persona.surname}</div>
+                <div>{student.School.name}</div>
+                <div>{intToRoman(Number(student.Cycle.cycle))}</div>
                 <div>
-                  <StudentStatusFlag status={student.status} />
+                  <StudentStatusFlag status={Number(student.state)} />
                 </div>
                 <div className="flex items-center gap-2">
-                  <UserIcon className="h-4 w-4" /> {student.supervisor}
+                  <UserIcon className="h-4 w-4" /> {student.Proceso[0]?.Supervisor.Docente.Persona.name + " " + student.Proceso[0]?.Supervisor.Docente.Persona.surname}
                 </div>
                 <div className="flex items-center gap-2">
                   <ClockIcon className="h-4 w-4" /> 4M
@@ -200,7 +227,7 @@ export default function Students() {
               </div>
               {student.show && (
                 <div className="flex items-center gap-4  rounded-b-lg p-4">
-                  {student.documents.map((document, documentIndex) => (
+                  {student.Proceso[0]?.Etapa.map((document: IEtapa, documentIndex) => (
                     <div
                       key={documentIndex}
                       className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
@@ -208,7 +235,7 @@ export default function Students() {
                       <PDFIcon className=" h-6 w-6 flex-none" />
                       <div>
                         <div className="whitespace-nowrap text-[0.625rem] font-bold">
-                          {document.name}
+                          {document.Tipo.name}
                         </div>
                         <div className="text-[0.4375rem] font-light">
                           Validado
@@ -227,22 +254,38 @@ export default function Students() {
         <div className="flex items-center justify-between">
           <div className="text-[0.625rem] text-[#757575]">1 - 4 de 54</div>
           <div className="flex items-center gap-2">
-            <button className="h-[1.5rem] w-[1.5rem] p-0.5 text-[#FF9853]">
+            <button
+              disabled={currentPage === 1}
+
+              className={`h-[1.5rem] w-[1.5rem] p-0.5
+            ${currentPage === 1 ? 'text-[#bababa]' : 'text-[#FF9853]'}`}
+              onClick={() => goToPreviousPage()} >
               <ChevronLeftIcon />
             </button>
             <div className="flex items-center ">
-              {[1, 2, 3].map((e, ind) => (
+              {/* {[1, 2, 3].map((e, ind) => (
                 <button
                   key={ind}
-                  className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem]   text-[0.625rem] ${
-                    ind == 0 ? "bg-[#FF9853] text-white" : "text-[#757575]"
-                  }`}
+                  className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] ${ind == 0 ? "bg-[#FF9853] text-white" : "text-[#757575]"
+                    }`}
                 >
                   {e}
                 </button>
+              ))} */}
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button key={index} className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
+                ${currentPage == index + 1 ? "bg-[#FF9853] text-white" : "text-[#757575]"
+                  }`} onClick={() => handlePageChange(index + 1)}>
+                  {index + 1}
+                </button>
               ))}
             </div>
-            <button className="h-[1.5rem] w-[1.5rem] p-0.5 text-[#FF9853]">
+            <button onClick={() => goToNextPage()}
+              disabled={currentPage === totalPages}
+
+              className={`h-[1.5rem] w-[1.5rem] p-0.5
+              
+              ${currentPage === totalPages ? 'text-[#bababa]' : 'text-[#FF9853]'}`}>
               <ChevronRightIcon />
             </button>
           </div>
