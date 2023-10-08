@@ -144,24 +144,33 @@ export default function Students() {
 
   // Filtra los datos según el término de búsqueda
   const filteredData = studentList.filter(item =>
-    item.Persona.name.toLowerCase().includes(searchTerm.toLowerCase())
+    item.Persona.name.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
+    item.Persona.surname.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
+    item.code.toLowerCase().trim().includes(searchTerm.toLowerCase())
+
   );
 
   // Calcula las páginas totales
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.max(Math.ceil(filteredData.length / itemsPerPage), 1);
 
+  // Asegurarse de que currentPage no sea mayor que totalPages
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages);
+  }
   // Filtra los datos en función de la página actual
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const startIndex = Math.max((currentPage - 1) * itemsPerPage, 0);
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
   const currentData = filteredData.slice(startIndex, endIndex);
 
   // Cambia de página
   const handlePageChange = (page: any) => {
+    console.log(page)
     setCurrentPage(page);
   };
 
   // Cambia de página hacia atrás
   const goToPreviousPage = () => {
+    console.log(currentPage)
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
@@ -174,6 +183,12 @@ export default function Students() {
     }
   };
 
+  // Restablece currentPage a 1 cuando se borra el término de búsqueda
+  const handleSearchTermChange = (newSearchTerm: any) => {
+    setSearchTerm(newSearchTerm);
+    setCurrentPage(1);
+  };
+
   return (
     <>
       <StudentDocumentPreview />
@@ -182,6 +197,8 @@ export default function Students() {
           <div className="flex overflow-hidden rounded-lg ">
             <input
               type="text"
+              value={searchTerm}
+              onChange={(e) => handleSearchTermChange(e.target.value)}
               className=" px-4 py-2 placeholder:text-sm placeholder:font-light placeholder:text-[#C4C4C4] focus:outline-none"
               placeholder="Buscar..."
             />
@@ -193,6 +210,10 @@ export default function Students() {
             <FunnelIcon className="h-4 w-4" />
           </button>
         </div>
+
+
+
+
         <div className="flex flex-col gap-4 ">
           <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
             <div>Código</div>
@@ -205,91 +226,98 @@ export default function Students() {
             <div>Opciones</div>
           </div>
 
-          {currentData.map((student, studentIndex) => (
-            <div key={studentIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
-              <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                <div>{student.code}</div>
-                <div>{student.Persona.name + " " + student.Persona.surname}</div>
-                <div>{student.School.name}</div>
-                <div>{intToRoman(Number(student.Cycle.cycle))}</div>
-                <div>
-                  <StudentStatusFlag status={Number(student.state)} />
-                </div>
-                <div className="flex items-center gap-2">
-                  <UserIcon className="h-4 w-4" /> {student.Proceso[0]?.Supervisor.Docente.Persona.name + " " + student.Proceso[0]?.Supervisor.Docente.Persona.surname}
-                </div>
-                <div className="flex items-center gap-2">
-                  <ClockIcon className="h-4 w-4" /> 4M
-                </div>
-                <div className="rounded-r-lg">
-                  <StudentOptions itemIndex={studentIndex} />
-                </div>
+          {filteredData.length === 0 ? (
+            <div className="rounded-[0.625rem] bg-[#D1D1D1]">
+              <div className="grid grid-cols-1 items-center rounded-[0.625rem] text-center bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                <div>No se encontraron registros que coincidan con el filtro.</div>
               </div>
-              {student.show && (
-                <div className="flex items-center gap-4  rounded-b-lg p-4">
-                  {student.Proceso[0]?.Etapa.map((document: IEtapa, documentIndex) => (
-                    <div
-                      key={documentIndex}
-                      className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
-                    >
-                      <PDFIcon className=" h-6 w-6 flex-none" />
-                      <div>
-                        <div className="whitespace-nowrap text-[0.625rem] font-bold">
-                          {document.Tipo.name}
-                        </div>
-                        <div className="text-[0.4375rem] font-light">
-                          Validado
-                        </div>
-                      </div>
-                      <button className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
-                        <EyeIcon />
-                      </button>
+            </div>
+          ) : (
+            <>
+              {currentData.map((student, studentIndex) => (
+                <div key={studentIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
+                  <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                    <div>{student.code}</div>
+                    <div>{student.Persona.name + " " + student.Persona.surname}</div>
+                    <div>{student.School.name}</div>
+                    <div>{intToRoman(Number(student.Cycle.cycle))}</div>
+                    <div>
+                      <StudentStatusFlag status={Number(student.state)} />
                     </div>
+                    <div className="flex items-center gap-2">
+                      <UserIcon className="h-4 w-4" /> {student.Proceso[0]?.Supervisor.Docente.Persona.name + " " + student.Proceso[0]?.Supervisor.Docente.Persona.surname}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ClockIcon className="h-4 w-4" /> 4M
+                    </div>
+                    <div className="rounded-r-lg">
+                      <StudentOptions itemIndex={studentIndex} />
+                    </div>
+                  </div>
+                  {student.show && (
+                    <div className="flex items-center gap-4  rounded-b-lg p-4">
+                      {student.Proceso[0]?.Etapa.map((document: IEtapa, documentIndex) => (
+                        <div
+                          key={documentIndex}
+                          className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
+                        >
+                          <PDFIcon className=" h-6 w-6 flex-none" />
+                          <div>
+                            <div className="whitespace-nowrap text-[0.625rem] font-bold">
+                              {document.Tipo.name}
+                            </div>
+                            <div className="text-[0.4375rem] font-light">
+                              Validado
+                            </div>
+                          </div>
+                          <button className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
+                            <EyeIcon />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+
+        {filteredData.length !== 0 && (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="text-[0.625rem] text-[#757575]"> {`${startIndex + 1} - ${Math.min(endIndex, filteredData.length)} de ${filteredData.length}`} </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={currentPage === 1}
+
+                  className={`h-[1.5rem] w-[1.5rem] p-0.5
+            ${currentPage === 1 ? 'text-[#bababa]' : 'text-[#FF9853]'}`}
+                  onClick={() => goToPreviousPage()} >
+                  <ChevronLeftIcon />
+                </button>
+                <div className="flex items-center ">
+                  {Array.from({ length: totalPages }, (_, index) => (
+                    <button key={index} className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
+                ${currentPage == index + 1 ? "bg-[#FF9853] text-white" : "text-[#757575]"
+                      }`} onClick={() => handlePageChange(index + 1)}>
+                      {index + 1}
+                    </button>
                   ))}
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="text-[0.625rem] text-[#757575]">1 - 4 de 54</div>
-          <div className="flex items-center gap-2">
-            <button
-              disabled={currentPage === 1}
+                <button onClick={() => goToNextPage()}
+                  disabled={currentPage === totalPages}
 
-              className={`h-[1.5rem] w-[1.5rem] p-0.5
-            ${currentPage === 1 ? 'text-[#bababa]' : 'text-[#FF9853]'}`}
-              onClick={() => goToPreviousPage()} >
-              <ChevronLeftIcon />
-            </button>
-            <div className="flex items-center ">
-              {/* {[1, 2, 3].map((e, ind) => (
-                <button
-                  key={ind}
-                  className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] ${ind == 0 ? "bg-[#FF9853] text-white" : "text-[#757575]"
-                    }`}
-                >
-                  {e}
-                </button>
-              ))} */}
-              {Array.from({ length: totalPages }, (_, index) => (
-                <button key={index} className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
-                ${currentPage == index + 1 ? "bg-[#FF9853] text-white" : "text-[#757575]"
-                  }`} onClick={() => handlePageChange(index + 1)}>
-                  {index + 1}
-                </button>
-              ))}
-            </div>
-            <button onClick={() => goToNextPage()}
-              disabled={currentPage === totalPages}
-
-              className={`h-[1.5rem] w-[1.5rem] p-0.5
+                  className={`h-[1.5rem] w-[1.5rem] p-0.5
               
               ${currentPage === totalPages ? 'text-[#bababa]' : 'text-[#FF9853]'}`}>
-              <ChevronRightIcon />
-            </button>
-          </div>
-        </div>
+                  <ChevronRightIcon />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
