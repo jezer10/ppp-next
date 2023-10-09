@@ -22,6 +22,9 @@ import Image from "next/image";
 import useSWR from "swr";
 import { IApiResponse, IEtapa, IStudent } from "./interfaces/student";
 import { intToRoman } from "@/utils/romanConverter";
+import Modal from "@/components/Modal";
+import InfoStudent from "./components/InfoStudent";
+import { ModalProps } from "./interfaces/modal";
 
 const fetcher = async (url: string) => {
   const response = await fetch(url);
@@ -42,28 +45,42 @@ export default function Students() {
       icon: IdentificationIcon,
       name: "Info Estudiante",
       actionFunction: (idx: number) => {
-        console.log(idx)
+        const itemFound = studentList.find(x => x.student_id === idx);
+        console.log(itemFound);
+        const studentFound:ModalProps = {
+          fullName: itemFound!.Persona?.name + " " + itemFound!.Persona?.surname,
+          codeStudent: itemFound!.code,
+          cycle: itemFound!.Cycle?.cycle,
+          school: itemFound!.School?.name,
+          DNI: itemFound!.Persona?.dni,
+          email: itemFound!.Persona?.email,
+          phone: itemFound!.Persona?.phone,
+          practicesMode: itemFound!.Proceso[0]?.type
+        }
+        setSelectedStudentData(studentFound)
+        setModalOpen(true)
+      }
+    },
+    // { icon: ArrowTrendingUpIcon, name: "Estado", actionFunction: () => { } },
+    {
+      icon: DocumentIcon, name: "Documentos", actionFunction: (idx: number) => {
         setStudentList((prevStudentList) => {
           const closedItems = prevStudentList.map((e) => ({
             ...e,
             show: false,
           }));
-          console.log(closedItems)
-          const itemFound = closedItems.find(x => x.student_id == idx);
+          const itemFound = closedItems.find(x => x.student_id === idx);
           itemFound!.show = true
-          // closedItems[idx]["show"] = true;
           return closedItems;
         });
       },
     },
-    { icon: ArrowTrendingUpIcon, name: "Estado", actionFunction: () => { } },
-    { icon: DocumentIcon, name: "Documentos", actionFunction: () => { } },
     {
       icon: UserGroupIcon,
       name: "Cambiar Supervisor",
       actionFunction: () => { },
     },
-    { icon: TrashIcon, name: "Eliminar", actionFunction: () => { } },
+    // { icon: TrashIcon, name: "Eliminar", actionFunction: () => { } },
   ];
 
   function StudentOptions(props: any) {
@@ -193,8 +210,33 @@ export default function Students() {
     setCurrentPage(1);
   };
 
+  const initModalValues:ModalProps = {
+    fullName: null,
+    codeStudent: null,
+    school: null,
+    cycle: null,
+    DNI: null,
+    phone: null,
+    email: null,
+    practicesMode: null
+  }
+
+  const [modalOpen, setModalOpen] = useState(true);
+  const [selectedStudentData, setSelectedStudentData] = useState<ModalProps>(initModalValues);
+
+
+  const handleModalToggle = () => {
+    setModalOpen(!modalOpen);
+  };
+
   return (
     <>
+      <Modal
+        isOpen={modalOpen}
+        onClose={handleModalToggle}
+      >
+        <InfoStudent {...selectedStudentData}  />
+      </Modal>
       <StudentDocumentPreview />
       <div className="flex h-full flex-col gap-8">
         <div className="flex items-stretch justify-end gap-4">

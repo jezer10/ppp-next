@@ -2,6 +2,8 @@ interface IPersona {
   name: string;
   surname: string;
   email: string | null;
+  dni: string;
+  phone:string;
 }
 
 interface ICycle {
