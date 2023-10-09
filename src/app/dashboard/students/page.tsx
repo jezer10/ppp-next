@@ -42,12 +42,16 @@ export default function Students() {
       icon: IdentificationIcon,
       name: "Info Estudiante",
       actionFunction: (idx: number) => {
+        console.log(idx)
         setStudentList((prevStudentList) => {
           const closedItems = prevStudentList.map((e) => ({
             ...e,
             show: false,
           }));
-          closedItems[idx]["show"] = true;
+          console.log(closedItems)
+          const itemFound = closedItems.find(x => x.student_id == idx);
+          itemFound!.show = true
+          // closedItems[idx]["show"] = true;
           return closedItems;
         });
       },
@@ -66,9 +70,9 @@ export default function Students() {
     return (
       <Menu as="div" className="relative inline-block text-left">
         <div>
-          <Menu.Button className=" flex w-full items-center justify-center gap-2 rounded-md bg-[#EAEAEA] px-2  py-1 text-[0.625rem] text-[#757575]    focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+          <Menu.Button className="flex w-full items-center justify-center gap-2 rounded-md bg-[#EAEAEA] px-2  py-1 text-[0.625rem] text-[#757575] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
             Opciones
-            <ChevronDownIcon className="  w-[1rem] " aria-hidden="true" />
+            <ChevronDownIcon className="w-[1rem]" aria-hidden="true" />
           </Menu.Button>
         </div>
         <Transition
@@ -211,9 +215,6 @@ export default function Students() {
           </button>
         </div>
 
-
-
-
         <div className="flex flex-col gap-4 ">
           <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
             <div>Código</div>
@@ -228,7 +229,7 @@ export default function Students() {
 
           {filteredData.length === 0 ? (
             <div className="rounded-[0.625rem] bg-[#D1D1D1]">
-              <div className="grid grid-cols-1 items-center rounded-[0.625rem] text-center bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+              <div className="grid grid-cols-1 items-center rounded-[0.625rem] text-center bg-white px-4 py-6 text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
                 <div>No se encontraron registros que coincidan con el filtro.</div>
               </div>
             </div>
@@ -251,7 +252,7 @@ export default function Students() {
                       <ClockIcon className="h-4 w-4" /> 4M
                     </div>
                     <div className="rounded-r-lg">
-                      <StudentOptions itemIndex={studentIndex} />
+                      <StudentOptions itemIndex={student.student_id} />
                     </div>
                   </div>
                   {student.show && (
