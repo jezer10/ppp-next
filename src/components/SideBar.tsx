@@ -39,7 +39,7 @@ export default function SideBar() {
   
 
   return (
-    <aside className="flex h-full  w-80 flex-none flex-col  ">
+    <aside className="flex h-full bg-white w-80 flex-none flex-col z-[51] ">
       <div className="relative">
         <div className="flagg -translate-x-8 translate-y-2 bg-[#E4752B] "></div>
         <div className="absolute inset-0">

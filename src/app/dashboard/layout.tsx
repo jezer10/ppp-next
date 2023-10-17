@@ -49,7 +49,7 @@ export default function DashboardLayout({
             </button>
           </div>
         </header>
-        <section className="h-full ">{children}</section>
+        <section className="h-full">{children}</section>
       </main>
     </div>
   );

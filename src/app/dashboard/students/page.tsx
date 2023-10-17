@@ -24,7 +24,9 @@ import { IApiResponse, IEtapa, IStudent } from "./interfaces/student";
 import { intToRoman } from "@/utils/romanConverter";
 import Modal from "@/components/Modal";
 import InfoStudent from "./components/InfoStudent";
-import { ModalProps } from "./interfaces/modal";
+import { IManageDocument, IModalProps } from "./interfaces/modal";
+import DoubleModal from "@/components/DoubleModal";
+import ManageDocument from "./components/ManageDocument";
 
 const fetcher = async (url: string) => {
   const response = await fetch(url);
@@ -47,7 +49,7 @@ export default function Students() {
       actionFunction: (idx: number) => {
         const itemFound = studentList.find(x => x.student_id === idx);
         console.log(itemFound);
-        const studentFound:ModalProps = {
+        const studentFound: IModalProps = {
           fullName: itemFound!.Persona?.name + " " + itemFound!.Persona?.surname,
           codeStudent: itemFound!.code,
           cycle: itemFound!.Cycle?.cycle,
@@ -157,7 +159,7 @@ export default function Students() {
     );
   }
 
-  /* Pagination */
+  /* Paginación */
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
@@ -168,7 +170,6 @@ export default function Students() {
     item.Persona.name.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
     item.Persona.surname.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
     item.code.toLowerCase().trim().includes(searchTerm.toLowerCase())
-
   );
 
   // Calcula las páginas totales
@@ -210,7 +211,7 @@ export default function Students() {
     setCurrentPage(1);
   };
 
-  const initModalValues:ModalProps = {
+  const initModalValues: IModalProps = {
     fullName: null,
     codeStudent: null,
     school: null,
@@ -220,23 +221,59 @@ export default function Students() {
     email: null,
     practicesMode: null
   }
+  const initDoubleModalValues: IManageDocument = {
+    studentName: null,
+    documentName: null,
+    onClose: () => { }
+  }
 
-  const [modalOpen, setModalOpen] = useState(true);
-  const [selectedStudentData, setSelectedStudentData] = useState<ModalProps>(initModalValues);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [doubleModalOpen, setDoubleModalOpen] = useState(false);
+
+  const [selectedStudentData, setSelectedStudentData] = useState<IModalProps>(initModalValues);
+  const [selectedDocumentData, setSelectedDocumentData] = useState<IManageDocument>(initDoubleModalValues);
 
 
   const handleModalToggle = () => {
     setModalOpen(!modalOpen);
   };
 
+  const handleDoubleModalToggle = () => {
+    setDoubleModalOpen(!doubleModalOpen);
+  };
+
+  const handleManageDocument = (idx:number) => {
+    const itemFound = studentList.find(x => x.student_id === idx);
+    console.log(itemFound);
+    const documentFound: IManageDocument = {
+      studentName: itemFound!.Persona?.name + " " + itemFound!.Persona?.surname,
+      documentName: itemFound!.Proceso[0]?.Etapa[0].filename,
+    }
+    setSelectedDocumentData(documentFound)
+    setDoubleModalOpen(true)
+  }
+
   return (
-    <>
+    <div className="h-full">
       <Modal
         isOpen={modalOpen}
         onClose={handleModalToggle}
       >
-        <InfoStudent {...selectedStudentData}  />
+        <InfoStudent {...selectedStudentData} />
       </Modal>
+      <DoubleModal isOpen={doubleModalOpen} onClose={handleDoubleModalToggle}>
+        <div className="w-[70%] bg-[#404040] rounded-l-lg">
+          {/* aqui pon el componente de  la previsualización */}
+        </div>
+        <div className="w-[30%]">
+          <ManageDocument
+            studentName={selectedDocumentData.studentName}
+            documentName={selectedDocumentData.documentName}
+            onClose={handleDoubleModalToggle}
+          />
+        </div>
+      </DoubleModal>
+
       <StudentDocumentPreview />
       <div className="flex h-full flex-col gap-8">
         <div className="flex items-stretch justify-end gap-4">
@@ -313,7 +350,7 @@ export default function Students() {
                               Validado
                             </div>
                           </div>
-                          <button className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
+                          <button onClick={() => handleManageDocument(student.student_id)} className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
                             <EyeIcon />
                           </button>
                         </div>
@@ -362,7 +399,7 @@ export default function Students() {
           </>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
