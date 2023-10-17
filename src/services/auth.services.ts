@@ -1,4 +1,4 @@
-import { config } from "@/config";
+import config from "@/config";
 
 const URL_APIS = config.BACK_URL;
 

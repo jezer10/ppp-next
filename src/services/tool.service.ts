@@ -1,10 +1,8 @@
-import { config } from "../config";
+import config from "../config";
 import { CreateToolBody } from "./interfaces/tool";
 const URL_APIS = config.BACK_URL;
 
-
 export const ToolService = {
-
   async getTools() {
     try {
       const response = await fetch(URL_APIS + "/tool", {
@@ -27,7 +25,7 @@ export const ToolService = {
     }
   },
 
-  async createTool(toolData:CreateToolBody) {
+  async createTool(toolData: CreateToolBody) {
     try {
       const response = await fetch(URL_APIS + "/tool/create", {
         method: "POST",
@@ -49,5 +47,4 @@ export const ToolService = {
       throw error;
     }
   },
-
 };

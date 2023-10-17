@@ -26,20 +26,17 @@ export default function SideBar() {
 
   const [menuItems, setMenuItems] = useState([]);
 
-
-  async function getAccess(){
-    const accesos = await AccessAuthService(roles[0].role_id)
-    setMenuItems(accesos.info)
+  async function getAccess() {
+    const accesos = await AccessAuthService(roles[0].role_id);
+    setMenuItems(accesos.info);
   }
 
   useEffect(() => {
-    getAccess()
-  
-  }, [roles])
-  
+    getAccess();
+  }, [roles]);
 
   return (
-    <aside className="flex h-full bg-white w-80 flex-none flex-col z-[51] ">
+    <aside className="z-[51] flex h-full w-80 flex-none flex-col bg-white ">
       <div className="relative">
         <div className="flagg -translate-x-8 translate-y-2 bg-[#E4752B] "></div>
         <div className="absolute inset-0">
@@ -60,24 +57,25 @@ export default function SideBar() {
       <div className="flex h-full flex-col justify-between gap-4 px-8 py-4">
         <nav>
           <ul className=" flex flex-col gap-2">
-            {menuItems.length !== 0 && menuItems.map((e : any, index) => {
-              const path = `/dashboard${e.url || ""}`;
-              const isActive = pathname === path;
-              return (
-                <li key={index}>
-                  <Link
-                    href={path}
-                    className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${
-                      isActive
-                        ? "bg-[#FF9853] font-bold text-white"
-                        : "text-[#C4C4C4]"
-                    }`}
-                  >
-                    <HomeIcon className="h-4 w-4" /> <div>{e.name}</div>
-                  </Link>
-                </li>
-              );
-            })}
+            {menuItems.length !== 0 &&
+              menuItems.map((e: any, index) => {
+                const path = `/dashboard${e.url || ""}`;
+                const isActive = pathname === path;
+                return (
+                  <li key={index}>
+                    <Link
+                      href={path}
+                      className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${
+                        isActive
+                          ? "bg-[#FF9853] font-bold text-white"
+                          : "text-[#C4C4C4]"
+                      }`}
+                    >
+                      <HomeIcon className="h-4 w-4" /> <div>{e.name}</div>
+                    </Link>
+                  </li>
+                );
+              })}
           </ul>
         </nav>
         <div className="flex items-center justify-between  text-[#C4C4C4] ">

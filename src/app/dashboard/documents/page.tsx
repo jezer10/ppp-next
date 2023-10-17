@@ -1,18 +1,15 @@
 "use client";
 // import { PrismaClient } from '@prisma/client';
 // const prisma = new PrismaClient();
-import preview_document from "@public/preview_document.png";
 import document_logo from "@public/document_logo.svg";
 import upload_cloud from "@public/upload_cloud.svg";
 import loader_icon from "@public/loader.svg";
-import firebase from "firebase/app";
-import { storage } from "../../../config/firebase";
+import { storage } from "@/config/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Document, Page } from "react-pdf";
+import { useForm } from "react-hook-form";
 
-import { Menu, Transition, Switch, Dialog } from "@headlessui/react";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Menu, Transition, Switch } from "@headlessui/react";
+import { Fragment, useEffect, useState } from "react";
 import {
   TrashIcon,
   EllipsisHorizontalIcon,
