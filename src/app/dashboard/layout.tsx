@@ -11,7 +11,7 @@ import { getSession, useSession } from "next-auth/react";
 import { useInformation } from "@/lib/hooks/useInformation";
 
 export default function DashboardLayout({
-  children,
+  children
 }: {
   children: React.ReactNode;
 }) {
