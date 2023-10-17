@@ -16,15 +16,14 @@ const handler = NextAuth({
         },
         USR_PASSWORD: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {        
-
+      async authorize(credentials, { body }) {
+        const { username, password } = body!;
         const login = await LoginAuthService({
-          username: req.body!.username,
-          password: req.body!.password,
+          username,
+          password,
         });
-
         if (login.status !== 200) {
-            throw new Error(`${login.message}`)
+          throw new Error(`${login.message}`);
         }
         return login;
       },

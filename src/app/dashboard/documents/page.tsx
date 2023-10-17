@@ -29,7 +29,7 @@ const documentList = [
 ];
 
 export default function Documents() {
-  const { register, handleSubmit, watch, errors } = useForm();
+  const { register, handleSubmit, watch } = useForm();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -37,7 +37,7 @@ export default function Documents() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploadingCount, setUploadingCount] = useState(0);
 
-  const [xd, setDocumentList] = useState();
+  const [xd, setDocumentList] = useState([] as any[]);
 
   useEffect(() => {
     getDocumentsList();
@@ -46,7 +46,6 @@ export default function Documents() {
   const getDocumentsList = async () => {
     const response = await fetch("http://localhost:4000/documents");
     const data = await response.json();
-    console.log(data.info);
     setDocumentList(data.info);
   };
 
@@ -86,7 +85,6 @@ export default function Documents() {
     console.log(documentName);
 
     if (!documentName) {
-      console.error("El nombre del documento es requerido.");
       return;
     }
 
@@ -95,17 +93,13 @@ export default function Documents() {
 
   function handleUpload(documentName: string) {
     if (!storage) {
-      console.error("Firebase storage no inicializado");
       return;
     }
 
     uploadedFiles.forEach((file) => {
-      // Incrementa el contador al inicio de la carga de un archivo
       setUploadingCount((prev) => prev + 1);
-
       const fileRef = ref(storage, `uploads/${Date.now()}-${file.name}`);
       const uploadTask = uploadBytesResumable(fileRef, file);
-
       uploadTask.on(
         "state_changed",
         (snapshot) => {
@@ -115,35 +109,25 @@ export default function Documents() {
           setProgress(progress);
         },
         (error) => {
-          console.error("Upload failed:", error);
-
-          // Decrementa el contador en caso de error
           setUploadingCount((prev) => prev - 1);
         },
         async () => {
-          console.log("Upload completed!");
-
-          // Decrementa el contador después de la carga exitosa
           setUploadingCount((prev) => prev - 1);
 
-          // Limpiar el archivo de la lista una vez que esté cargado
           setUploadedFiles((prevFiles) => prevFiles.filter((f) => f !== file));
           const downloadURL = await getDownloadURL(fileRef);
-          console.log("File available at", downloadURL);
-          console.log("name", documentName);
+
           const response = await fetch("http://localhost:4000/documents", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              name: documentName, // Recoge este dato del formulario
+              name: documentName,
               file_route: downloadURL,
             }),
           });
-
           const data = await response.json();
-          console.log(data);
         },
       );
     });
@@ -161,7 +145,6 @@ export default function Documents() {
   }
   function addFile(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []) as File[];
-    console.log(files);
     setUploadedFiles((prevFiles) => [...prevFiles, ...files] as File[]);
     e.target.value = "";
   }
@@ -270,7 +253,7 @@ export default function Documents() {
         </form>
       )}
       <div className="grid grid-cols-3 gap-4">
-        {xd?.map((document, id) => (
+        {xd!.map((document, id) => (
           <div key={id} className="group flex flex-col gap-1">
             <div className="relative h-40 rounded-lg">
               {document.enabled ? (

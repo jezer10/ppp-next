@@ -18,12 +18,12 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: ["Educational"],
-  // authors: [
-  //   {
-  //     name: "Mijail Palomino",
-  //   },
-  // ],
-  // creator: "Mijail Palomino",
+  authors: [
+    {
+      name: "Mijail Palomino",
+    },
+  ],
+  creator: "Mijail Palomino",
 };
 interface RootLayoutProps {
   children: React.ReactNode;

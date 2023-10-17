@@ -13,18 +13,15 @@ import {
 } from "@heroicons/react/24/solid";
 
 import { ToastContainer, toast } from "react-toastify";
-
 import "react-toastify/dist/ReactToastify.css";
-
 import { useState } from "react";
-import { LoginAuthService } from "@/services";
-import { getSession, signIn, useSession } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const Home = () => {
   const [isValid, setValid] = useState(false);
   const [visible, setVisible] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -48,23 +45,21 @@ const Home = () => {
 
     // const login_service = await LoginAuthService(login);
 
-    const login_obj = await signIn("credentials", {
+    const signInResponse = await signIn("credentials", {
       username: login.username,
       password: login.password,
-      redirect : false
+      redirect: false,
     });
-
-    
-    if (login_obj!.error) {
-      return toast.error(login_obj!.error);
+    if (signInResponse?.error) {
+      return toast.error(signInResponse.error);
     }
 
-    const session = await getSession()
-    console.log(session);
-    
-    const {user} = session as any
-    toast.success((user.message).toUpperCase())
-    router.push("/dashboard")
+    const session = await getSession();
+    console.log("session", session);
+
+    const { user } = session as any;
+    toast.success(user.message.toUpperCase());
+    router.push("/dashboard");
     // if (login_service.status !== 200) {
     //   setValid(false);
     //   throw login_service.message;

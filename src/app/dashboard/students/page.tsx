@@ -1,6 +1,4 @@
 "use client";
-import { Document, Page } from "react-pdf";
-
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -8,17 +6,14 @@ import {
   ChevronLeftIcon,
   ChevronDownIcon,
   IdentificationIcon,
-  ArrowTrendingUpIcon,
   DocumentIcon,
   UserGroupIcon,
-  TrashIcon,
   EyeIcon,
   UserIcon,
   ClockIcon,
 } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import useSWR from "swr";
 import { IApiResponse, IEtapa, IStudent } from "./interfaces/student";
 import { intToRoman } from "@/utils/romanConverter";
@@ -34,9 +29,11 @@ const fetcher = async (url: string) => {
   return data;
 };
 export default function Students() {
-
   const [studentList, setStudentList] = useState<IStudent[]>([]);
-  const { data = null, error } = useSWR<IApiResponse<IStudent[]>>("http://localhost:4000/student", fetcher);
+  const { data = null, error } = useSWR<IApiResponse<IStudent[]>>(
+    "http://localhost:4000/student",
+    fetcher,
+  );
 
   useEffect(() => {
     if (data) setStudentList(data.info);
@@ -47,32 +44,35 @@ export default function Students() {
       icon: IdentificationIcon,
       name: "Info Estudiante",
       actionFunction: (idx: number) => {
-        const itemFound = studentList.find(x => x.student_id === idx);
+        const itemFound = studentList.find((x) => x.student_id === idx);
         console.log(itemFound);
         const studentFound: IModalProps = {
-          fullName: itemFound!.Persona?.name + " " + itemFound!.Persona?.surname,
+          fullName:
+            itemFound!.Persona?.name + " " + itemFound!.Persona?.surname,
           codeStudent: itemFound!.code,
           cycle: itemFound!.Cycle?.cycle,
           school: itemFound!.School?.name,
           DNI: itemFound!.Persona?.dni,
           email: itemFound!.Persona?.email,
           phone: itemFound!.Persona?.phone,
-          practicesMode: itemFound!.Proceso[0]?.type
-        }
-        setSelectedStudentData(studentFound)
-        setModalOpen(true)
-      }
+          practicesMode: itemFound!.Proceso[0]?.type,
+        };
+        setSelectedStudentData(studentFound);
+        setModalOpen(true);
+      },
     },
     // { icon: ArrowTrendingUpIcon, name: "Estado", actionFunction: () => { } },
     {
-      icon: DocumentIcon, name: "Documentos", actionFunction: (idx: number) => {
+      icon: DocumentIcon,
+      name: "Documentos",
+      actionFunction: (idx: number) => {
         setStudentList((prevStudentList) => {
           const closedItems = prevStudentList.map((e) => ({
             ...e,
             show: false,
           }));
-          const itemFound = closedItems.find(x => x.student_id === idx);
-          itemFound!.show = true
+          const itemFound = closedItems.find((x) => x.student_id === idx);
+          itemFound!.show = true;
           return closedItems;
         });
       },
@@ -80,7 +80,7 @@ export default function Students() {
     {
       icon: UserGroupIcon,
       name: "Cambiar Supervisor",
-      actionFunction: () => { },
+      actionFunction: () => {},
     },
     // { icon: TrashIcon, name: "Eliminar", actionFunction: () => { } },
   ];
@@ -110,8 +110,9 @@ export default function Students() {
                   {({ active }) => (
                     <button
                       onClick={() => actionFunction(props.itemIndex)}
-                      className={`${active && "bg-[#EEEEEE]"
-                        } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
+                      className={`${
+                        active && "bg-[#EEEEEE]"
+                      } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
                     >
                       <Icon className="w-[0.75rem]" />
                       {name}
@@ -139,22 +140,23 @@ export default function Students() {
   function StudentStatusFlag({ status }: { status: number }) {
     return (
       <span
-        className={`rounded px-2 py-0.5  text-white ${status === 0
-          ? "bg-[#29EB77]"
-          : status === 1
+        className={`rounded px-2 py-0.5  text-white ${
+          status === 0
+            ? "bg-[#29EB77]"
+            : status === 1
             ? "bg-[#FFC700]"
             : status === 2
-              ? "bg-[#FC6767]"
-              : "bg-[#49D3FE]"
-          }`}
+            ? "bg-[#FC6767]"
+            : "bg-[#49D3FE]"
+        }`}
       >
         {status === 0
           ? "En prácticas"
           : status === 1
-            ? "Pendiente"
-            : status === 2
-              ? "Sin Confirmar"
-              : "Finalizado"}
+          ? "Pendiente"
+          : status === 2
+          ? "Sin Confirmar"
+          : "Finalizado"}
       </span>
     );
   }
@@ -163,13 +165,20 @@ export default function Students() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Filtra los datos según el término de búsqueda
-  const filteredData = studentList.filter(item =>
-    item.Persona.name.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
-    item.Persona.surname.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
-    item.code.toLowerCase().trim().includes(searchTerm.toLowerCase())
+  const filteredData = studentList.filter(
+    (item) =>
+      item.Persona.name
+        .toLowerCase()
+        .trim()
+        .includes(searchTerm.toLowerCase()) ||
+      item.Persona.surname
+        .toLowerCase()
+        .trim()
+        .includes(searchTerm.toLowerCase()) ||
+      item.code.toLowerCase().trim().includes(searchTerm.toLowerCase()),
   );
 
   // Calcula las páginas totales
@@ -186,13 +195,13 @@ export default function Students() {
 
   // Cambia de página
   const handlePageChange = (page: any) => {
-    console.log(page)
+    console.log(page);
     setCurrentPage(page);
   };
 
   // Cambia de página hacia atrás
   const goToPreviousPage = () => {
-    console.log(currentPage)
+    console.log(currentPage);
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
@@ -219,20 +228,21 @@ export default function Students() {
     DNI: null,
     phone: null,
     email: null,
-    practicesMode: null
-  }
+    practicesMode: null,
+  };
   const initDoubleModalValues: IManageDocument = {
     studentName: null,
     documentName: null,
-    onClose: () => { }
-  }
+    onClose: () => {},
+  };
 
   const [modalOpen, setModalOpen] = useState(false);
   const [doubleModalOpen, setDoubleModalOpen] = useState(false);
 
-  const [selectedStudentData, setSelectedStudentData] = useState<IModalProps>(initModalValues);
-  const [selectedDocumentData, setSelectedDocumentData] = useState<IManageDocument>(initDoubleModalValues);
-
+  const [selectedStudentData, setSelectedStudentData] =
+    useState<IModalProps>(initModalValues);
+  const [selectedDocumentData, setSelectedDocumentData] =
+    useState<IManageDocument>(initDoubleModalValues);
 
   const handleModalToggle = () => {
     setModalOpen(!modalOpen);
@@ -242,27 +252,24 @@ export default function Students() {
     setDoubleModalOpen(!doubleModalOpen);
   };
 
-  const handleManageDocument = (idx:number) => {
-    const itemFound = studentList.find(x => x.student_id === idx);
+  const handleManageDocument = (idx: number) => {
+    const itemFound = studentList.find((x) => x.student_id === idx);
     console.log(itemFound);
     const documentFound: IManageDocument = {
       studentName: itemFound!.Persona?.name + " " + itemFound!.Persona?.surname,
       documentName: itemFound!.Proceso[0]?.Etapa[0].filename,
-    }
-    setSelectedDocumentData(documentFound)
-    setDoubleModalOpen(true)
-  }
+    };
+    setSelectedDocumentData(documentFound);
+    setDoubleModalOpen(true);
+  };
 
   return (
     <div className="h-full">
-      <Modal
-        isOpen={modalOpen}
-        onClose={handleModalToggle}
-      >
+      <Modal isOpen={modalOpen} onClose={handleModalToggle}>
         <InfoStudent {...selectedStudentData} />
       </Modal>
       <DoubleModal isOpen={doubleModalOpen} onClose={handleDoubleModalToggle}>
-        <div className="w-[70%] bg-[#404040] rounded-l-lg">
+        <div className="w-[70%] rounded-l-lg bg-[#404040]">
           {/* aqui pon el componente de  la previsualización */}
         </div>
         <div className="w-[30%]">
@@ -308,24 +315,34 @@ export default function Students() {
 
           {filteredData.length === 0 ? (
             <div className="rounded-[0.625rem] bg-[#D1D1D1]">
-              <div className="grid grid-cols-1 items-center rounded-[0.625rem] text-center bg-white px-4 py-6 text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                <div>No se encontraron registros que coincidan con el filtro.</div>
+              <div className="grid grid-cols-1 items-center rounded-[0.625rem] bg-white px-4 py-6 text-center text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                <div>
+                  No se encontraron registros que coincidan con el filtro.
+                </div>
               </div>
             </div>
           ) : (
             <>
               {currentData.map((student, studentIndex) => (
-                <div key={studentIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
+                <div
+                  key={studentIndex}
+                  className="rounded-[0.625rem] bg-[#D1D1D1]"
+                >
                   <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
                     <div>{student.code}</div>
-                    <div>{student.Persona.name + " " + student.Persona.surname}</div>
+                    <div>
+                      {student.Persona.name + " " + student.Persona.surname}
+                    </div>
                     <div>{student.School.name}</div>
                     <div>{intToRoman(Number(student.Cycle.cycle))}</div>
                     <div>
                       <StudentStatusFlag status={Number(student.state)} />
                     </div>
                     <div className="flex items-center gap-2">
-                      <UserIcon className="h-4 w-4" /> {student.Proceso[0]?.Supervisor.Docente.Persona.name + " " + student.Proceso[0]?.Supervisor.Docente.Persona.surname}
+                      <UserIcon className="h-4 w-4" />{" "}
+                      {student.Proceso[0]?.Supervisor.Docente.Persona.name +
+                        " " +
+                        student.Proceso[0]?.Supervisor.Docente.Persona.surname}
                     </div>
                     <div className="flex items-center gap-2">
                       <ClockIcon className="h-4 w-4" /> 4M
@@ -336,25 +353,32 @@ export default function Students() {
                   </div>
                   {student.show && (
                     <div className="flex items-center gap-4  rounded-b-lg p-4">
-                      {student.Proceso[0]?.Etapa.map((document: IEtapa, documentIndex) => (
-                        <div
-                          key={documentIndex}
-                          className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
-                        >
-                          <PDFIcon className=" h-6 w-6 flex-none" />
-                          <div>
-                            <div className="whitespace-nowrap text-[0.625rem] font-bold">
-                              {document.Tipo.name}
+                      {student.Proceso[0]?.Etapa.map(
+                        (document: IEtapa, documentIndex) => (
+                          <div
+                            key={documentIndex}
+                            className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
+                          >
+                            <PDFIcon className=" h-6 w-6 flex-none" />
+                            <div>
+                              <div className="whitespace-nowrap text-[0.625rem] font-bold">
+                                {document.Tipo.name}
+                              </div>
+                              <div className="text-[0.4375rem] font-light">
+                                Validado
+                              </div>
                             </div>
-                            <div className="text-[0.4375rem] font-light">
-                              Validado
-                            </div>
+                            <button
+                              onClick={() =>
+                                handleManageDocument(student.student_id)
+                              }
+                              className="h-6 w-6 rounded-lg p-1 hover:bg-white/20"
+                            >
+                              <EyeIcon />
+                            </button>
                           </div>
-                          <button onClick={() => handleManageDocument(student.student_id)} className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
-                            <EyeIcon />
-                          </button>
-                        </div>
-                      ))}
+                        ),
+                      )}
                     </div>
                   )}
                 </div>
@@ -366,32 +390,48 @@ export default function Students() {
         {filteredData.length !== 0 && (
           <>
             <div className="flex items-center justify-between">
-              <div className="text-[0.625rem] text-[#757575]"> {`${startIndex + 1} - ${Math.min(endIndex, filteredData.length)} de ${filteredData.length}`} </div>
+              <div className="text-[0.625rem] text-[#757575]">
+                {" "}
+                {`${startIndex + 1} - ${Math.min(
+                  endIndex,
+                  filteredData.length,
+                )} de ${filteredData.length}`}{" "}
+              </div>
 
               <div className="flex items-center gap-2">
                 <button
                   disabled={currentPage === 1}
-
                   className={`h-[1.5rem] w-[1.5rem] p-0.5
-            ${currentPage === 1 ? 'text-[#bababa]' : 'text-[#FF9853]'}`}
-                  onClick={() => goToPreviousPage()} >
+            ${currentPage === 1 ? "text-[#bababa]" : "text-[#FF9853]"}`}
+                  onClick={() => goToPreviousPage()}
+                >
                   <ChevronLeftIcon />
                 </button>
                 <div className="flex items-center ">
                   {Array.from({ length: totalPages }, (_, index) => (
-                    <button key={index} className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
-                ${currentPage == index + 1 ? "bg-[#FF9853] text-white" : "text-[#757575]"
-                      }`} onClick={() => handlePageChange(index + 1)}>
+                    <button
+                      key={index}
+                      className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
+                ${
+                  currentPage == index + 1
+                    ? "bg-[#FF9853] text-white"
+                    : "text-[#757575]"
+                }`}
+                      onClick={() => handlePageChange(index + 1)}
+                    >
                       {index + 1}
                     </button>
                   ))}
                 </div>
-                <button onClick={() => goToNextPage()}
+                <button
+                  onClick={() => goToNextPage()}
                   disabled={currentPage === totalPages}
-
                   className={`h-[1.5rem] w-[1.5rem] p-0.5
               
-              ${currentPage === totalPages ? 'text-[#bababa]' : 'text-[#FF9853]'}`}>
+              ${
+                currentPage === totalPages ? "text-[#bababa]" : "text-[#FF9853]"
+              }`}
+                >
                   <ChevronRightIcon />
                 </button>
               </div>
