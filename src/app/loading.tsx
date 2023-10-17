@@ -1,8 +1,11 @@
+import { LoadingComponent } from '@/components/LoadingComponent'
 import React from 'react'
 
 function Loading() {
   return (
-    <div>Loading ...</div>
+    <div className='h-[100vh]'>
+      <LoadingComponent/>
+    </div>
   )
 }
 

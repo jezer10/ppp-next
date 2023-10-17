@@ -1,3 +1,7 @@
+import { LoadingComponent } from "@/components/LoadingComponent";
+
 export default function Supervisors() {
-  return <div>This is supervisors</div>;
+  return <>
+  <LoadingComponent></LoadingComponent>
+  </>;
 }

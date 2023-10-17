@@ -16,3 +16,9 @@ export const LoginAuthService = async (login_obj : any) => {
     const response = await api.json();
     return response
 }
+
+export const AccessAuthService = async (rol : any) => {
+    const api = await fetch(URL_APIS + "/rol/" + rol)
+    const response = await api.json();
+    return response
+}

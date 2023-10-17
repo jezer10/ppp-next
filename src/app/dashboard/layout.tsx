@@ -16,6 +16,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user_data } = useInformation();
+
+  if (!user_data) {
+    return <div>Loading...</div>;
+  }
+    
   return (
     <div className="flex h-screen items-stretch">
       <SideBar />

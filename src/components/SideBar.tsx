@@ -9,18 +9,34 @@ import profile_pic from "../../public/dreyna.jpg";
 import { HomeIcon, ArrowLeftOnRectangleIcon } from "@heroicons/react/24/solid";
 import { signOut } from "next-auth/react";
 import { useInformation } from "@/lib/hooks/useInformation";
-const menuItems = [
-  { id: 1, name: "Inicio", path: "" },
-  { id: 2, name: "Documentos PPP", path: "/documents" },
-  { id: 3, name: "Estudiantes", path: "/students" },
-  { id: 4, name: "Supervisores", path: "/supervisors" },
-  { id: 5, name: "Solicitudes", path: "/requests" },
-  { id: 6, name: "Test", path: "/tests" },
-  { id: 7, name: "Configuración", path: "/settings" },
-];
+import { useEffect, useState } from "react";
+import { AccessAuthService } from "@/services";
+// const menuItems = [
+//   { id: 1, name: "Inicio", path: "" },
+//   { id: 2, name: "Documentos PPP", path: "/documents" },
+//   { id: 3, name: "Estudiantes", path: "/students" },
+//   { id: 4, name: "Supervisores", path: "/supervisors" },
+//   { id: 5, name: "Solicitudes", path: "/requests" },
+//   { id: 6, name: "Test", path: "/tests" },
+//   { id: 7, name: "Configuración", path: "/settings" },
+// ];
 export default function SideBar() {
   const { user_data, roles } = useInformation();
   const pathname = usePathname();
+
+  const [menuItems, setMenuItems] = useState([]);
+
+
+  async function getAccess(){
+    const accesos = await AccessAuthService(roles[0].role_id)
+    setMenuItems(accesos.info)
+  }
+
+  useEffect(() => {
+    getAccess()
+  
+  }, [roles])
+  
 
   return (
     <aside className="flex h-full  w-80 flex-none flex-col  ">
@@ -44,8 +60,8 @@ export default function SideBar() {
       <div className="flex h-full flex-col justify-between gap-4 px-8 py-4">
         <nav>
           <ul className=" flex flex-col gap-2">
-            {menuItems.map((e, index) => {
-              const path = `/dashboard${e.path}`;
+            {menuItems.length !== 0 && menuItems.map((e : any, index) => {
+              const path = `/dashboard${e.url || ""}`;
               const isActive = pathname === path;
               return (
                 <li key={index}>
