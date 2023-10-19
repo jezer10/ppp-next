@@ -50,18 +50,20 @@ export default function DashboardLayout({
   const handleCheckPreview = async () => {
     setVisto(true)
 
-    // try {
-    //   const response = await fetch(URL_APIS + "/student/introduccion_visto/" + userId, {
-    //     method: "PUT", // Usamos el método PUT para la actualización
-    //     headers: {
-    //       Accept: "application/json",
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ introduccion_visto: true }), // Los datos que deseas actualizar
-    //   });
-    // } catch (error) {
-
-    // }
+    try {
+      const userId = user_data[0].user_id;
+      const response = await fetch(URL_APIS + "/student/update-view-intro/" + userId, {
+        method: "PUT", // Usamos el método PUT para la actualización
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ introduccion_visto: true }), // Los datos que deseas actualizar
+      });
+      console.log(response)
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const handleNextPreview = () => {

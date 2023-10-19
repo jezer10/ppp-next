@@ -2,12 +2,13 @@ import {
     ArrowUturnLeftIcon,
     PlusIcon
 } from "@heroicons/react/20/solid";
-import { IDimension } from "../interfaces/dimension";
+import { CreateTool, Dimension, IDimension } from "../interfaces/dimension";
 import { IApiResponse } from "../../students/interfaces/student";
 import useSWR from "swr";
 import { useEffect, useState } from "react";
 import Dropdown from "./Dropdown";
 import { PlusCircleIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { CreateToolRequest } from "../interfaces/tool";
 
 interface ManageToolProps {
     onBack: () => void;
@@ -23,13 +24,28 @@ export default function ManageTool(props: ManageToolProps) {
 
     const { data: dimData = null, error } = useSWR<IApiResponse<IDimension[]>>("http://localhost:4000/dimension", fetcher);
     const [dimList, setDimList] = useState<IDimension[]>([]);
+
+    const [toolSchema, setToolSchema] = useState<CreateTool>({ name: null, dimensions: [] });
+
     const [selectedDims, setSelectedDims] = useState<IDimension[]>([]);
     const [selected, setSelected] = useState({ dimension_id: 0, name: "Añada una dimensión" })
 
     const handleAddDimension = () => {
         if (selected) {
-            // Agregar a selectedDims
-            setSelectedDims((prevSelectedDims) => [...prevSelectedDims, selected]);
+            const newDimension: Dimension = {
+                dimension_id: selected.dimension_id,
+                name: selected.name,
+                items: [], // Puedes inicializar los items como un arreglo vacío o según tus necesidades
+            };
+    
+            // Agregar la nueva dimensión a toolSchema
+            setToolSchema((prevToolSchema: CreateTool) => ({
+                ...prevToolSchema,
+                dimensions: prevToolSchema.dimensions
+                    ? [...prevToolSchema.dimensions, newDimension]
+                    : [newDimension], // Si prevToolSchema.dimensions es null o undefined, crea un nuevo arreglo con newDimension
+            }));
+
 
             // Quitar de dimList
             setDimList((prevDimList) => prevDimList.filter((dim) => dim.dimension_id !== selected.dimension_id));
@@ -38,18 +54,30 @@ export default function ManageTool(props: ManageToolProps) {
         }
     };
 
-    const handleRemoveDimension = (dimension: IDimension) => {
+    const handleRemoveDimension = (dimension: any) => {
         // Agregar de nuevo a dimList
-        setDimList((prevDimList) => [...prevDimList, dimension]);
-    
+        setDimList((prevDimList) => [...prevDimList, {dimension_id: dimension.dimension_id, name: dimension.name}]);
+
         // Quitar de selectedDims
-        setSelectedDims((prevSelectedDims) => prevSelectedDims.filter((dim) => dim.dimension_id !== dimension.dimension_id));
-      };
-    
+    setToolSchema((prevToolSchema: CreateTool) => {
+        if (prevToolSchema.dimensions) {
+            return {
+                ...prevToolSchema,
+                dimensions: prevToolSchema.dimensions.filter((dim) => dim.dimension_id !== dimension.dimension_id),
+            };
+        }
+        return prevToolSchema; // Si dimensions es null o undefined, no hacemos cambios en toolSchema
+    });
+    };
+
 
     useEffect(() => {
         if (dimData) setDimList(dimData?.info);
     }, [dimData]);
+
+    useEffect(() => {
+        console.log(toolSchema)
+    },[toolSchema])
 
 
 
@@ -84,7 +112,8 @@ export default function ManageTool(props: ManageToolProps) {
                 </div>
                 <div>
                     {
-                        selectedDims.length === 0 ? (
+                        /* selectedDims.length === 0 */
+                        toolSchema.dimensions?.length === 0 ? (
                             <div className="rounded-[0.625rem] bg-[#D1D1D1]">
                                 <div className="grid grid-cols-1 items-center rounded-[0.625rem] text-center bg-white px-4 py-6 text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
                                     <div>No hay dimensiones para este instrumento.</div>
@@ -92,7 +121,7 @@ export default function ManageTool(props: ManageToolProps) {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-4">
-                                {selectedDims.map((dim, dimIndex) => (
+                                {toolSchema.dimensions?.map((dim, dimIndex) => (
                                     <div key={dimIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
                                         <div className="grid grid-cols-2 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-sm font-normal text-[#717070] shadow ">
                                             <div>{dim.name}</div>
