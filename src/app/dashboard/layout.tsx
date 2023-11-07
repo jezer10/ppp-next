@@ -173,8 +173,7 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen items-stretch">
       <SideBar />
-      <main className="relative flex h-full w-full flex-col gap-4 overflow-y-auto p-4">
-        <div className="absolute inset-0 -z-10 h-full w-full bg-[#EEE]" />
+      <main className="relative flex h-full w-full flex-col gap-4 overflow-y-auto p-4" style={{ backgroundColor: "#EEE" }}>
         <header className="flex items-center justify-between">
           <div className="text-[#757575]">
             <div className="text-2xl font-bold">Inicio</div>
@@ -198,7 +197,7 @@ export default function DashboardLayout({
             </button>
           </div>
         </header>
-        <section className="h-full">{children}</section>
+        <section className="">{children}</section>
       </main>
     </div>
   );

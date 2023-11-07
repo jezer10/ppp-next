@@ -17,6 +17,7 @@ export interface Dimension {
   
 export interface CreateTool {
     name?: string | null;
+    type?:number | null;
     dimensions?: Dimension[] | null | undefined;
 }
 
