@@ -21,13 +21,8 @@ import {
 import Image from "next/image";
 
 const documentList = [
-<<<<<<< HEAD
-  { id: 1, name: "Ficha de evaluación tutor empresarial", enabled: false },
-  { id: 2, name: "Ficha de evaluación tutor academico", enabled: true },
-=======
   { id: 1, name: 'Ficha de evaluación tutor empresarial', enabled: false },
   { id: 2,name : 'Ficha de evaluación tutor academico', enabled: true },
->>>>>>> mijail.palomino
 ];
 
 export default function Documents() {
