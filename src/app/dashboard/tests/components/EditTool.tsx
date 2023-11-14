@@ -10,13 +10,11 @@ import Dropdown from "./Dropdown";
 import { XMarkIcon, FolderIcon } from "@heroicons/react/24/solid";
 import { config } from "@/config";
 import { ConfirmAlert, InfoAlert, SuccessAlert } from "@/components/Alert";
-import { IToolResponse } from "../interfaces/ToolResponse";
 
-interface ManageToolProps {
+interface EditToolProps {
+    toolId: number;
     onBack: () => void;
-    manageToolSuccess: (message: string) => void;
-    isEditing: boolean;
-    toolId?: number | null;
+    editToolSuccess: () => void;
 }
 
 const fetcher = async (url: string) => {
@@ -25,9 +23,9 @@ const fetcher = async (url: string) => {
     return data;
 };
 
-export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolId }: ManageToolProps) {
+export default function EditTool(props: EditToolProps) {
     const URL_APIS = config.BACK_URL;
-    const { data: dimData = null } = useSWR<IApiResponse<IDimension[]>>("http://localhost:4000/dimension", fetcher);
+    const { data: dimData = null, error } = useSWR<IApiResponse<IDimension[]>>("http://localhost:4000/dimension", fetcher);
     const [dimList, setDimList] = useState<IDimension[]>([]);
     const [toolSchema, setToolSchema] = useState<CreateTool>({ name: "", dimensions: [] });
     const [selected, setSelected] = useState({ dimension_id: 0, name: "Añada una dimensión" })
@@ -37,11 +35,6 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
     const [isOpenSuccess, setIsOpenSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [messageInfo, setMessageInfo] = useState("")
-
-
-    /* Tool  */
-
-   
 
     const handleRadioButtonChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newLevel = Number(event.target.value);
@@ -127,6 +120,7 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
     };
 
     const handleRemoveItem = (dimension: Dimension, item: Item) => {
+        // Encuentra la dimensión correspondiente en toolSchema y quita el item
         setToolSchema((prevToolSchema: CreateTool) => ({
             ...prevToolSchema,
             dimensions: prevToolSchema.dimensions?.map((dim) => {
@@ -153,13 +147,14 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
             return false;
         }
 
-        if (!toolSchema.dimensions?.length) {
+        if (toolSchema.dimensions?.length === 0) {
             setMessageInfo("Ingrese al menos una dimensión.")
             setIsOpenInfo(true)
             return false;
         }
 
         if (toolSchema.dimensions!.length > 0) {
+            // Verificar que todas las dimensiones tengan longitud mayor a 0
             for (const dimension of toolSchema.dimensions!) {
                 if (dimension.items?.length === 0) {
                     setMessageInfo("Ingrese al menos un item para la dimensión: " + dimension.name);
@@ -170,6 +165,14 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
         }
 
         return true;
+    }
+
+    const openModalConfirmation = () => {
+        const isToolValidated = validateTool();
+        if (isToolValidated) {
+            setIsOpenConfirm(true);
+        }
+
     }
 
     const saveTool = async () => {
@@ -186,78 +189,9 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
         setIsOpenConfirm(false)
         setIsLoading(false);
         // setIsOpenSuccess(true);
-        manageToolSuccess('Se ha creado el instrumento de evaluación.');
-        onBack();
+        // props.createToolSuccess();
+        props.onBack();
     }
-
-    const fetchDimensions = async () => {
-        try {
-            const response = await fetch(`${URL_APIS}/dimension`);
-            const data = await response.json();
-            setDimList(data.info)
-        } catch (error) {
-            console.error("Error en la solicitud de datos del instrumento:", error);
-        }
-    }
-
-    /* Only In Editing */
-
-    const fetchToolDataById = async (toolId: number) => {
-        try {
-            const response = await fetch(`${URL_APIS}/tool/${toolId}`);
-            const data = await response.json();
-            loadToolDataInSchema(data.info)
-        } catch (error) {
-            console.error("Error en la solicitud de datos del instrumento:", error);
-        }
-    };
-
-    const loadToolDataInSchema = async (data: IToolResponse) => {
-        console.log(data)
-        setToolSchema((prevToolSchema) => ({
-            ...prevToolSchema,
-            name: data.name,
-            type: data.type,
-            dimensions: data.Instrumento_Dimension.map((dimResponse) => ({
-                dimension_id: dimResponse.Dimension.dimension_id,
-                name: dimResponse.Dimension.name,
-                items: dimResponse.Item.map((itemResponse) => ({
-                    name: itemResponse.name,
-                })),
-            })),
-        }));
-
-        // Obtén una lista de los `dimension_id` de las dimensiones ya cargadas en `toolSchema`
-        const loadedDimensionIds = new Set(
-            data.Instrumento_Dimension?.map((dim) => dim.Dimension.dimension_id) || []
-        );
-
-        const response = await fetch(`${URL_APIS}/dimension`);
-        const re = await response.json();
-
-        console.log(loadedDimensionIds)
-        console.log(dimList)
-        // Filtra `dimList` para eliminar las dimensiones que ya han sido cargadas
-        const updatedDimList = re.info.filter(
-            (dim:any) => !loadedDimensionIds.has(dim.dimension_id)
-        );
-        console.log(updatedDimList);
-
-        // Actualiza `dimList` con la lista filtrada
-        setDimList(updatedDimList);
-
-    }
-
-
-    /* Modals */
-
-    const openModalConfirmation = () => {
-        const isToolValidated = validateTool();
-        if (isToolValidated) {
-            setIsOpenConfirm(true);
-        }
-
-    };
 
     const handleInfoModal = () => {
         setIsOpenInfo(!isOpenInfo);
@@ -271,20 +205,17 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
         setIsOpenSuccess(!isOpenSuccess);
     };
 
-    useEffect(() => {
-        fetchDimensions();
-    }, []);
+    const loadToolData = async () => {
+        
+    }
 
     useEffect(() => {
-        const fetchData = async () => {
-            await fetchDimensions();
-            if (toolId && isEditing) {
-                fetchToolDataById(toolId);
-            }
-        };
-    
-        fetchData();
-    }, [toolId, isEditing]);
+        if (dimData) setDimList(dimData?.info);
+    }, [dimData]);
+
+    useEffect(() => {
+        loadToolData();
+    }, []);
 
     return (
         <>
@@ -311,7 +242,7 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
 
                 <div className="flex h-full flex-col gap-x-3 gap-y-5 mb-5">
                     <div className="flex justify-end">
-                        <button onClick={() => onBack()} className="min-h-full flex gap-3 items-center rounded-lg bg-[#FF9853] px-4 py-2 text-white">
+                        <button onClick={() => props.onBack()} className="min-h-full flex gap-3 items-center rounded-lg bg-[#FF9853] px-4 py-2 text-white">
                             <ArrowUturnLeftIcon className="h-4 w-4" /> Atrás
                         </button>
                     </div>
@@ -333,7 +264,6 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
                                     id="inicio"
                                     name="nivel"
                                     value="0"
-                                    checked={toolSchema.type === 0}
                                     onChange={handleRadioButtonChange}
                                     className="mr-2 form-radio h-4 w-4 text-indigo-600"
                                 />
@@ -346,7 +276,6 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
                                     id="intermedio"
                                     name="nivel"
                                     value="1"
-                                    checked={toolSchema.type === 1}
                                     onChange={handleRadioButtonChange}
                                     className="mr-2 form-radio h-4 w-4 text-indigo-600"
                                 />
@@ -359,7 +288,6 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
                                     id="final"
                                     name="nivel"
                                     value="2"
-                                    checked={toolSchema.type === 2}
                                     onChange={handleRadioButtonChange}
                                     className="mr-2 form-radio h-4 w-4 text-indigo-600"
                                 />
@@ -390,7 +318,7 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
                                 <div className="flex flex-col gap-4">
                                     {toolSchema.dimensions?.map((dim, dimIndex) => (
                                         <>
-                                            <div key={dim.dimension_id} className="rounded-[0.625rem] bg-[#D1D1D1]">
+                                            <div key={dimIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
                                                 <div className="grid grid-cols-3 gap-4 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-sm font-normal text-[#717070] shadow ">
                                                     <div className="col-span-1" >{dim.name}</div>
                                                     <div className="col-span-2 flex flex-col-reverse md:flex-row gap-4 rounded-r-lg items-end md:justify-end">
@@ -427,15 +355,15 @@ export default function ManageTool({ onBack, manageToolSuccess, isEditing, toolI
                                                             <>
                                                                 {
                                                                     dim.items?.map((itm, itmIndex) => (
-                                                                        <div key={itmIndex} className="col-span-3">
+                                                                        <div className="col-span-3">
                                                                             <div className="grid grid-cols-3 items-center rounded-[0.625rem]  text-center bg-slate-100 px-4 py-6 text-sm font-normal text-[#717070] shadow ">
                                                                                 <div className="col-span-2" >{itm.name}</div>
                                                                                 <div className="col-span-1 flex flex-row gap-4 rounded-r-lg justify-end">
                                                                                     <button onClick={() => handleRemoveItem(dim, itm)} className="min-h-full flex gap-3 items-center rounded-lg bg-[#FE7272] px-4 py-2 text-white">
                                                                                         <XMarkIcon className="h-4 w-4" /> Quitar
                                                                                     </button>
-                                                                                </div>
-                                                                            </div>
+                                                                                </div>                                                            </div>
+
                                                                         </div>
                                                                     ))
                                                                 }
