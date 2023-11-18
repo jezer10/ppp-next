@@ -33,7 +33,7 @@ const Sidebar = () => {
 
   async function getAccess() {
     const accesos = await AccessAuthService(roles[0].role_id)
-    setMenuItems(accesos.info)
+    setMenuItems(accesos.info.filter((e : any) => e.father_id == null))
   }
 
   useEffect(() => {
@@ -155,7 +155,7 @@ const Sidebar = () => {
             <ul className="flex flex-col gap-2">
               {menuItems.length !== 0 && menuItems.map((e: any, index) => {
                 const path = `/dashboard${e.url || ""}`;
-                const isActive = pathname === path;
+                const isActive = e.url === null ? (pathname === path) : pathname.startsWith(path);
                 return (
                   <li key={index}>
                     <Link
