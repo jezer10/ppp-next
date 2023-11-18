@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-
 import "./dashboard.css";
 import SideBar from "@/components/SideBar";
 import Image from "next/image";
@@ -10,7 +9,6 @@ import image_18 from "@public/image_18.svg";
 import image_17 from "@public/image_17.svg";
 import image_16 from "@public/image_16.svg";
 import { GlobeAltIcon } from "@heroicons/react/24/outline";
-import { getSession, useSession } from "next-auth/react";
 import { useInformation } from "@/lib/hooks/useInformation";
 import { config } from "@/config";
 
@@ -23,6 +21,7 @@ export default function DashboardLayout({
   const [visto, setVisto] = useState(true);
   const [step, setStep] = useState(1);
   const URL_APIS = config.BACK_URL;
+
 
   const validateFirstScreen = async () => {
     const userId = user_data[0].user_id;
