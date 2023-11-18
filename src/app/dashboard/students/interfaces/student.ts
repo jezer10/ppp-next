@@ -64,4 +64,4 @@ interface IStudent {
   show:boolean
 }
 
-export type { IApiResponse, IStudent, IEtapa};
+// export type { IApiResponse, IStudent, IEtapa};

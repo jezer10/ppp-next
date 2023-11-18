@@ -13,4 +13,5 @@ export interface IManageDocument {
     studentName:string | null;
     documentName:string | null;
     onClose?: () => void;
+    isLoading?: boolean;
 }

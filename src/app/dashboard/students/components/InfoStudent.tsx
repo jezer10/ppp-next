@@ -5,7 +5,7 @@ import { IModalProps } from "../interfaces/modal";
 function InfoStudent(modalProps: IModalProps) {
     return (
         <>
-            <section className="flex flex-col gap-5">
+            <section className="flex flex-col gap-8">
                 <div className="w-full flex flex-row justify-center">
                     <div className="h-20 w-20 overflow-hidden rounded-full ">
                         <Image src={user} alt="user image" />

@@ -93,7 +93,7 @@ const Sidebar = () => {
 
       <div
         onClick={() => setOpen(false)}
-        className={`md:hidden fixed inset-0 max-h-screen z-[998] bg-black/50 ${open ? "block" : "hidden"}`}
+        className={`md:hidden fixed inset-0 max-h-screen z-[900] bg-black/50 ${open ? "block" : "hidden"}`}
       ></div>
 
       <motion.div
@@ -101,7 +101,7 @@ const Sidebar = () => {
         variants={Nav_animation}
         initial={{ x: isTabletMid ? -250 : 0 }}
         animate={open ? "open" : "closed"}
-        className="bg-white text-gray shadow-xl z-[999] max-w-80 w-80 overflow-y-auto md:relative fixed 
+        className="bg-white text-gray shadow-xl z-[901] max-w-80 w-80 overflow-y-auto md:relative fixed 
         
         flex h-full  flex-none flex-col gap-8"
       >
