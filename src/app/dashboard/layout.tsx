@@ -41,10 +41,13 @@ export default function DashboardLayout({
       });
 
       const data = await response.json();
-      const lol = data?.info.introduccion_visto;
-      console.log(lol)
-      setVisto(lol);
-      console.log(data);
+
+      if(data.status === 200){
+        const lol = data?.info.introduccion_visto;
+        console.log(lol)
+        setVisto(lol);
+        console.log(data);
+      }
     }
   }
 
