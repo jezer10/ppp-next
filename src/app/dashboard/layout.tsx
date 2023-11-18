@@ -11,6 +11,7 @@ import image_16 from "@public/image_16.svg";
 import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import { useInformation } from "@/lib/hooks/useInformation";
 import { config } from "@/config";
+import { LoadingComponent } from "@/components/LoadingComponent";
 
 export default function DashboardLayout({
   children
@@ -74,7 +75,9 @@ export default function DashboardLayout({
   }, [])
 
   if (!user_data) {
-    return <div>Loading...</div>;
+    return <div className='h-[100vh]'>
+    <LoadingComponent/>
+  </div>
   }
 
   if (!visto) {
