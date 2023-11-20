@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.card{
+    @apply flex flex-row gap-2 rounded-lg active:bg-[#f5a068] cursor-pointer hover:text-white shadow-lg w-[100%];
+}
+
+.card__image{
+    @apply bg-[#0F3971] w-[20%] rounded-tr-md rounded-br-md flex justify-center items-center p-4
+}
+
+.card:hover{
+    @apply bg-[#0F3971] ease-in-out duration-500
+}
+
+.card:hover .card__image{
+    @apply  bg-[#FF9853] ease-in-out duration-500
+}
+
+.card:active{
+    @apply bg-[white] text-black ease-in-out duration-500
+}
+
+/* .card:hover .card__image{
+    @apply  bg-[#FF9853] ease-in-out duration-500
+} */

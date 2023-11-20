@@ -11,12 +11,12 @@ export default withAuth(async function middleware(req: NextRequestWithAuth) {
   // console.log(info);
 
   const access = await AccessAuthService(roles[0].role_id);
-  // console.log(access);
 
   if (access.status !== 200) return NextResponse.rewrite(new URL("/", req.url));
 
   let access_names =
     access && access.info.map((ac: any) => "/dashboard" + (ac.url || ""));
+    console.log(access_names);
   let roles_names = roles.map((role: any) => role.name);
 
   if (!access_names.includes(req.nextUrl.pathname)) {

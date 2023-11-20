@@ -1,31 +1,19 @@
 "use client";
-
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
-import { IApiResponse } from "../students/interfaces/student";
-import { ToolService } from "@/services/tool.service";
-import { CreateToolBody } from "@/services/interfaces/tool";
+import { IApiResponse } from "../students/interfaces/process";
 import { ITool } from "./interfaces/tool";
 import { Menu, Transition } from "@headlessui/react";
 import {
   MagnifyingGlassIcon,
-  FunnelIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
   ChevronDownIcon,
-  IdentificationIcon,
-  ArrowTrendingUpIcon,
-  DocumentIcon,
-  UserGroupIcon,
   TrashIcon,
-  EyeIcon,
-  UserIcon,
-  ClipboardDocumentListIcon,
   PencilSquareIcon,
   PlusCircleIcon
 } from "@heroicons/react/20/solid";
 import ManageTool from "./components/ManageTool";
-import Dropdown from "./components/Dropdown";
 import { config } from "@/config";
 import { ConfirmAlert, SuccessAlert } from "@/components/Alert";
 
@@ -47,7 +35,7 @@ export default function Tests() {
   }, [toolData]);
 
   const toolOptionsItems = [
-    { icon: ClipboardDocumentListIcon, name: "Detalle", actionFunction: (idx: number) => { } },
+    // { icon: ClipboardDocumentListIcon, name: "Detalle", actionFunction: (idx: number) => { } },
     {
       icon: PencilSquareIcon, name: "Editar", actionFunction: (idx: number) => {
         setIsEditing(true)
@@ -128,7 +116,6 @@ export default function Tests() {
   };
 
   const goToPreviousPage = () => {
-    console.log(currentPage)
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
@@ -188,7 +175,6 @@ export default function Tests() {
           "Content-Type": "application/json",
         }
       })
-      console.log(response)
       setSelectedToolID(null);
       setIsOpenConfirm(false);
       setIsLoading(false)
@@ -200,7 +186,6 @@ export default function Tests() {
   }
 
   const manageToolSuccess = (message: string) => {
-    console.log(message)
     setIsOpenSuccessManage({ state: true, message: message })
   }
 
