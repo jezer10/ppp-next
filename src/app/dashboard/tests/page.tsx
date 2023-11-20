@@ -3,30 +3,20 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { IApiResponse } from "../students/interfaces/student";
-import { ToolService } from "@/services/tool.service";
-import { CreateToolBody } from "@/services/interfaces/tool";
 import { ITool } from "./interfaces/tool";
 import { Menu, Transition } from "@headlessui/react";
 import {
   MagnifyingGlassIcon,
-  FunnelIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
   ChevronDownIcon,
-  IdentificationIcon,
-  ArrowTrendingUpIcon,
-  DocumentIcon,
-  UserGroupIcon,
   TrashIcon,
-  EyeIcon,
-  UserIcon,
   ClipboardDocumentListIcon,
   PencilSquareIcon,
-  PlusCircleIcon
+  PlusCircleIcon,
 } from "@heroicons/react/20/solid";
 import ManageTool from "./components/ManageTool";
-import Dropdown from "./components/Dropdown";
-import { config } from "@/config";
+import config from "@/config";
 import { ConfirmAlert, SuccessAlert } from "@/components/Alert";
 
 const fetcher = async (url: string) => {
@@ -36,10 +26,13 @@ const fetcher = async (url: string) => {
 };
 
 export default function Tests() {
-
-  const { data: toolData = null, error } = useSWR<IApiResponse<ITool[]>>("http://localhost:4000/tool", fetcher, { revalidateOnMount: true, revalidateOnFocus: true });
+  const { data: toolData = null, error } = useSWR<IApiResponse<ITool[]>>(
+    "http://localhost:4000/tool",
+    fetcher,
+    { revalidateOnMount: true, revalidateOnFocus: true },
+  );
   const [toolList, setToolList] = useState<ITool[]>([]);
-  const { mutate } = useSWRConfig()
+  const { mutate } = useSWRConfig();
   const URL_APIS = config.BACK_URL;
 
   useEffect(() => {
@@ -47,20 +40,28 @@ export default function Tests() {
   }, [toolData]);
 
   const toolOptionsItems = [
-    { icon: ClipboardDocumentListIcon, name: "Detalle", actionFunction: (idx: number) => { } },
     {
-      icon: PencilSquareIcon, name: "Editar", actionFunction: (idx: number) => {
-        setIsEditing(true)
-        setSelectedToolID(idx)
-        setManageToolComponent(true)
-      }
+      icon: ClipboardDocumentListIcon,
+      name: "Detalle",
+      actionFunction: (idx: number) => {},
     },
     {
-      icon: TrashIcon, name: "Eliminar", actionFunction: (idx: number) => {
+      icon: PencilSquareIcon,
+      name: "Editar",
+      actionFunction: (idx: number) => {
+        setIsEditing(true);
+        setSelectedToolID(idx);
+        setManageToolComponent(true);
+      },
+    },
+    {
+      icon: TrashIcon,
+      name: "Eliminar",
+      actionFunction: (idx: number) => {
         setIsOpenConfirm(true);
         setSelectedToolID(idx);
-      }
-    }
+      },
+    },
   ];
 
   function ToolOptions(props: any) {
@@ -88,8 +89,9 @@ export default function Tests() {
                   {({ active }) => (
                     <button
                       onClick={() => actionFunction(props.itemIndex)}
-                      className={`${active && "bg-[#EEEEEE]"
-                        } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
+                      className={`${
+                        active && "bg-[#EEEEEE]"
+                      } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
                     >
                       <Icon className="w-[0.75rem]" />
                       {name}
@@ -107,10 +109,10 @@ export default function Tests() {
   /* Paginación y filtro */
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredData = toolList.filter(item =>
-    item.name.toLowerCase().trim().includes(searchTerm.toLowerCase())
+  const filteredData = toolList.filter((item) =>
+    item.name.toLowerCase().trim().includes(searchTerm.toLowerCase()),
   );
 
   const totalPages = Math.max(Math.ceil(filteredData.length / itemsPerPage), 1);
@@ -128,7 +130,7 @@ export default function Tests() {
   };
 
   const goToPreviousPage = () => {
-    console.log(currentPage)
+    console.log(currentPage);
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
@@ -156,14 +158,17 @@ export default function Tests() {
   };
 
   const revalidateData = () => {
-    mutate('http://localhost:4000/tool')
-  }
+    mutate("http://localhost:4000/tool");
+  };
 
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
   const [isOpenSuccess, setIsOpenSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isOpenSuccessManage, setIsOpenSuccessManage] = useState({ state: false, message: '' }); // change to isOpenSuccessManage
+  const [isOpenSuccessManage, setIsOpenSuccessManage] = useState({
+    state: false,
+    message: "",
+  }); // change to isOpenSuccessManage
 
   const handleModalToggle = () => {
     setIsOpenConfirm(!isOpenConfirm);
@@ -174,40 +179,45 @@ export default function Tests() {
   };
 
   const handleSuccessModalManage = () => {
-    setIsOpenSuccessManage({ state: !isOpenSuccessManage.state, message: '' });
+    setIsOpenSuccessManage({ state: !isOpenSuccessManage.state, message: "" });
   };
 
   const handleDeleteTool = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const toolId = selectedToolID;
       const response = await fetch(URL_APIS + "/tool/" + toolId, {
         method: "DELETE",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-        }
-      })
-      console.log(response)
+        },
+      });
+      console.log(response);
       setSelectedToolID(null);
       setIsOpenConfirm(false);
-      setIsLoading(false)
+      setIsLoading(false);
       setIsOpenSuccess(true);
       revalidateData();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const manageToolSuccess = (message: string) => {
-    console.log(message)
-    setIsOpenSuccessManage({ state: true, message: message })
-  }
+    console.log(message);
+    setIsOpenSuccessManage({ state: true, message: message });
+  };
 
   if (manageToolComponent) {
     return (
-      <ManageTool toolId={selectedToolID} onBack={handleBackToMain} manageToolSuccess={manageToolSuccess} isEditing={isEditing} />
-    )
+      <ManageTool
+        toolId={selectedToolID}
+        onBack={handleBackToMain}
+        manageToolSuccess={manageToolSuccess}
+        isEditing={isEditing}
+      />
+    );
   }
 
   return (
@@ -249,10 +259,13 @@ export default function Tests() {
                 <MagnifyingGlassIcon className="h-4 w-4" />
               </button>
             </div>
-            <button onClick={() => {
-              setManageToolComponent(true)
-              setIsEditing(false)
-            }} className="min-h-full flex gap-3 items-center rounded-lg bg-[#FF9853] px-4 text-white">
+            <button
+              onClick={() => {
+                setManageToolComponent(true);
+                setIsEditing(false);
+              }}
+              className="flex min-h-full items-center gap-3 rounded-lg bg-[#FF9853] px-4 text-white"
+            >
               <PlusCircleIcon className="h-4 w-4" /> Nuevo
             </button>
           </div>
@@ -262,74 +275,86 @@ export default function Tests() {
               <div>Opciones</div>
             </div>
 
-            {
-              filteredData.length === 0 ? (
-                <div className="rounded-[0.625rem] bg-[#D1D1D1]">
-                  <div className="grid grid-cols-1 items-center rounded-[0.625rem] text-center bg-white px-4 py-6 text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                    <div>No se encontraron registros que coincidan con el filtro.</div>
+            {filteredData.length === 0 ? (
+              <div className="rounded-[0.625rem] bg-[#D1D1D1]">
+                <div className="grid grid-cols-1 items-center rounded-[0.625rem] bg-white px-4 py-6 text-center text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                  <div>
+                    No se encontraron registros que coincidan con el filtro.
                   </div>
                 </div>
-              ) : (
-                <>
-                  {currentData.map((tool, toolIndex) => (
-                    <div key={toolIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
-                      <div className="grid grid-cols-2 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                        <div>{tool.name}</div>
-                        <div className="rounded-r-lg">
-                          <ToolOptions itemIndex={tool.assesment_tool_id} />
-                        </div>
+              </div>
+            ) : (
+              <>
+                {currentData.map((tool, toolIndex) => (
+                  <div
+                    key={toolIndex}
+                    className="rounded-[0.625rem] bg-[#D1D1D1]"
+                  >
+                    <div className="grid grid-cols-2 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                      <div>{tool.name}</div>
+                      <div className="rounded-r-lg">
+                        <ToolOptions itemIndex={tool.assesment_tool_id} />
                       </div>
-
-                    </div>
-                  ))}
-                </>
-              )
-            }
-
-            {
-              filteredData.length !== 0 && (
-                <>
-                  <div className="flex items-center justify-between">
-                    <div className="text-[0.625rem] text-[#757575]"> {`${startIndex + 1} - ${Math.min(endIndex, filteredData.length)} de ${filteredData.length}`} </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        disabled={currentPage === 1}
-
-                        className={`h-[1.5rem] w-[1.5rem] p-0.5
-            ${currentPage === 1 ? 'text-[#bababa]' : 'text-[#FF9853]'}`}
-                        onClick={() => goToPreviousPage()} >
-                        <ChevronLeftIcon />
-                      </button>
-                      <div className="flex items-center ">
-                        {Array.from({ length: totalPages }, (_, index) => (
-                          <button key={index} className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
-                ${currentPage == index + 1 ? "bg-[#FF9853] text-white" : "text-[#757575]"
-                            }`} onClick={() => handlePageChange(index + 1)}>
-                            {index + 1}
-                          </button>
-                        ))}
-                      </div>
-                      <button onClick={() => goToNextPage()}
-                        disabled={currentPage === totalPages}
-
-                        className={`h-[1.5rem] w-[1.5rem] p-0.5
-              
-              ${currentPage === totalPages ? 'text-[#bababa]' : 'text-[#FF9853]'}`}>
-                        <ChevronRightIcon />
-                      </button>
                     </div>
                   </div>
-                </>
-              )
-            }
+                ))}
+              </>
+            )}
 
+            {filteredData.length !== 0 && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="text-[0.625rem] text-[#757575]">
+                    {" "}
+                    {`${startIndex + 1} - ${Math.min(
+                      endIndex,
+                      filteredData.length,
+                    )} de ${filteredData.length}`}{" "}
+                  </div>
 
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled={currentPage === 1}
+                      className={`h-[1.5rem] w-[1.5rem] p-0.5
+            ${currentPage === 1 ? "text-[#bababa]" : "text-[#FF9853]"}`}
+                      onClick={() => goToPreviousPage()}
+                    >
+                      <ChevronLeftIcon />
+                    </button>
+                    <div className="flex items-center ">
+                      {Array.from({ length: totalPages }, (_, index) => (
+                        <button
+                          key={index}
+                          className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
+                ${
+                  currentPage == index + 1
+                    ? "bg-[#FF9853] text-white"
+                    : "text-[#757575]"
+                }`}
+                          onClick={() => handlePageChange(index + 1)}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => goToNextPage()}
+                      disabled={currentPage === totalPages}
+                      className={`h-[1.5rem] w-[1.5rem] p-0.5
+              
+              ${
+                currentPage === totalPages ? "text-[#bababa]" : "text-[#FF9853]"
+              }`}
+                    >
+                      <ChevronRightIcon />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
     </>
-
-
   );
 }
