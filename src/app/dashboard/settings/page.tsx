@@ -1,3 +1,10 @@
+import { ProfileMain } from "@/components/ConfigurationComponent/ProfileMain";
+
 export default function Settings() {
-  return <div>This is settings</div>;
+  
+  return (
+    <div>
+      <ProfileMain/>
+    </div>
+  );
 }

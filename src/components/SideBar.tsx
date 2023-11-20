@@ -35,8 +35,8 @@ const Sidebar = () => {
   const [menuItems, setMenuItems] = useState([]);
 
   async function getAccess() {
-    const accesos = await AccessAuthService(roles[0].role_id);
-    setMenuItems(accesos.info);
+    const accesos = await AccessAuthService(roles[0].role_id)
+    setMenuItems(accesos.info.filter((e : any) => e.father_id == null))
   }
 
   useEffect(() => {
@@ -94,9 +94,7 @@ const Sidebar = () => {
 
       <div
         onClick={() => setOpen(false)}
-        className={`fixed inset-0 z-[998] max-h-screen bg-black/50 md:hidden ${
-          open ? "block" : "hidden"
-        }`}
+        className={`md:hidden fixed inset-0 max-h-screen z-[900] bg-black/50 ${open ? "block" : "hidden"}`}
       ></div>
 
       <motion.div
@@ -104,7 +102,7 @@ const Sidebar = () => {
         variants={Nav_animation}
         initial={{ x: isTabletMid ? -250 : 0 }}
         animate={open ? "open" : "closed"}
-        className="text-gray max-w-80 fixed z-[999] flex h-full w-80 flex-none flex-col 
+        className="bg-white text-gray shadow-xl z-[901] max-w-80 w-80 overflow-y-auto md:relative fixed 
         
         gap-8 overflow-y-auto  bg-white shadow-xl md:relative"
       >
@@ -154,18 +152,16 @@ const Sidebar = () => {
         >
           <nav>
             <ul className="flex flex-col gap-2">
-              {menuItems.length !== 0 &&
-                menuItems.map((e: any, index) => {
-                  const path = `/dashboard${e.url || ""}`;
-                  const isActive = pathname === path;
-                  return (
-                    <li key={index}>
-                      <Link
-                        href={path}
-                        className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${
-                          isActive
-                            ? "bg-[#FF9853] font-bold text-white"
-                            : "text-[#C4C4C4]"
+              {menuItems.length !== 0 && menuItems.map((e: any, index) => {
+                const path = `/dashboard${e.url || ""}`;
+                const isActive = e.url === null ? (pathname === path) : pathname.startsWith(path);
+                return (
+                  <li key={index}>
+                    <Link
+                      href={path}
+                      className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${isActive
+                        ? "bg-[#FF9853] font-bold text-white"
+                        : "text-[#C4C4C4]"
                         }`}
                       >
                         <DynamicHeroIcon icon={e.icon} />

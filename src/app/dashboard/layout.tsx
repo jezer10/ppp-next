@@ -9,6 +9,7 @@ import image_17 from "@public/image_17.svg";
 import image_16 from "@public/image_16.svg";
 import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import { useInformation } from "@/lib/hooks/useInformation";
+import { LoadingComponent } from "@/components/LoadingComponent";
 import config from "@/config";
 import "./dashboard.css";
 
@@ -21,6 +22,7 @@ export default function DashboardLayout({
   const [viewed, setViewed] = useState(true);
   const [step, setStep] = useState(1);
   const URL_APIS = config.BACK_URL;
+
 
   const validateFirstScreen = async () => {
     const userId = user?.user_id;
@@ -73,7 +75,9 @@ export default function DashboardLayout({
   });
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div className='h-[100vh]'>
+    <LoadingComponent/>
+  </div>
   }
 
   if (!viewed) {

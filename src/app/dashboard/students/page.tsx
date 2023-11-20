@@ -15,13 +15,14 @@ import {
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
-import { IApiResponse, IEtapa, IStudent } from "./interfaces/student";
+import { IApiResponse, IEtapa, IProcess } from "./interfaces/process";
 import { intToRoman } from "@/utils/romanConverter";
 import Modal from "@/components/Modal";
 import InfoStudent from "./components/InfoStudent";
 import { IManageDocument, IModalProps } from "./interfaces/modal";
 import DoubleModal from "@/components/DoubleModal";
 import ManageDocument from "./components/ManageDocument";
+import { ProcessService } from "@/services/process.service";
 
 const fetcher = async (url: string) => {
   const response = await fetch(url);
@@ -30,32 +31,38 @@ const fetcher = async (url: string) => {
 };
 export default function Students() {
   const [studentList, setStudentList] = useState<IStudent[]>([]);
-  const { data = null, error } = useSWR<IApiResponse<IStudent[]>>(
-    "http://localhost:4000/student",
-    fetcher,
-  );
+  const [processList, setProcessList] = useState<IProcess[]>([]);
+
+  const fetchProcesses = async () => {
+    const response: IApiResponse<IProcess[]> =
+      await ProcessService.getAllProcesses();
+    console.log(response.info);
+    setProcessList(response.info);
+  };
 
   useEffect(() => {
-    if (data) setStudentList(data.info);
-  }, [data]);
+    fetchProcesses();
+  }, []);
 
   const studentOptionItems = [
     {
       icon: IdentificationIcon,
       name: "Info Estudiante",
       actionFunction: (idx: number) => {
-        const itemFound = studentList.find((x) => x.student_id === idx);
+        const itemFound = processList.find((x) => x.process_id === idx);
         console.log(itemFound);
         const studentFound: IModalProps = {
           fullName:
-            itemFound!.Persona?.name + " " + itemFound!.Persona?.surname,
-          codeStudent: itemFound!.code,
-          cycle: itemFound!.Cycle?.cycle,
-          school: itemFound!.School?.name,
-          DNI: itemFound!.Persona?.dni,
-          email: itemFound!.Persona?.email,
-          phone: itemFound!.Persona?.phone,
-          practicesMode: itemFound!.Proceso[0]?.type,
+            itemFound!.Estudiante.Persona?.name +
+            " " +
+            itemFound!.Estudiante.Persona?.surname,
+          codeStudent: itemFound!.Estudiante.code,
+          cycle: itemFound!.Estudiante.Cycle?.cycle,
+          school: itemFound!.Estudiante.School?.name,
+          DNI: itemFound!.Estudiante.Persona?.dni,
+          email: itemFound!.Estudiante.Persona?.email,
+          phone: itemFound!.Estudiante.Persona?.phone,
+          practicesMode: itemFound!.type,
         };
         setSelectedStudentData(studentFound);
         setModalOpen(true);
@@ -66,12 +73,12 @@ export default function Students() {
       icon: DocumentIcon,
       name: "Documentos",
       actionFunction: (idx: number) => {
-        setStudentList((prevStudentList) => {
-          const closedItems = prevStudentList.map((e) => ({
+        setProcessList((prevProcessList) => {
+          const closedItems = prevProcessList.map((e) => ({
             ...e,
             show: false,
           }));
-          const itemFound = closedItems.find((x) => x.student_id === idx);
+          const itemFound = closedItems.find((x) => x.process_id === idx);
           itemFound!.show = true;
           return closedItems;
         });
@@ -85,7 +92,7 @@ export default function Students() {
     // { icon: TrashIcon, name: "Eliminar", actionFunction: () => { } },
   ];
 
-  function StudentOptions(props: any) {
+  function ProcessOptions(props: any) {
     return (
       <Menu as="div" className="relative inline-block text-left">
         <div>
@@ -127,16 +134,10 @@ export default function Students() {
     );
   }
 
-  function StudentDocumentPreview() {
-    return (
-      <div>
-        {/* <Document file={"http://infolab.stanford.edu/pub/papers/google.pdf"}>
-          <Page pageNumber={1} />
-        </Document> */}
-      </div>
-    );
-  }
-
+  // Estado de estudiante 0 : Estudiante esta actualmente en un proceso de prácticas pre profesionales
+  // 1: ................
+  // Quiza este status flasg no es necesario, aca puede ser En Prácticas y Finalizado, no más.
+  // Pendiente?,, Sin confirmar?
   function StudentStatusFlag({ status }: { status: number }) {
     return (
       <span
@@ -144,19 +145,19 @@ export default function Students() {
           status === 0
             ? "bg-[#29EB77]"
             : status === 1
-            ? "bg-[#FFC700]"
-            : status === 2
-            ? "bg-[#FC6767]"
-            : "bg-[#49D3FE]"
+              ? "bg-[#FFC700]"
+              : status === 2
+                ? "bg-[#FC6767]"
+                : "bg-[#49D3FE]"
         }`}
       >
         {status === 0
           ? "En prácticas"
           : status === 1
-          ? "Pendiente"
-          : status === 2
-          ? "Sin Confirmar"
-          : "Finalizado"}
+            ? "Pendiente"
+            : status === 2
+              ? "Sin Confirmar"
+              : "Finalizado"}
       </span>
     );
   }
@@ -168,17 +169,20 @@ export default function Students() {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Filtra los datos según el término de búsqueda
-  const filteredData = studentList.filter(
+  const filteredData = processList.filter(
     (item) =>
-      item.Persona.name
+      item.Estudiante.Persona.name
         .toLowerCase()
         .trim()
         .includes(searchTerm.toLowerCase()) ||
-      item.Persona.surname
+      item.Estudiante.Persona.surname
         .toLowerCase()
         .trim()
         .includes(searchTerm.toLowerCase()) ||
-      item.code.toLowerCase().trim().includes(searchTerm.toLowerCase()),
+      item.Estudiante.code
+        .toLowerCase()
+        .trim()
+        .includes(searchTerm.toLowerCase()),
   );
 
   // Calcula las páginas totales
@@ -230,6 +234,7 @@ export default function Students() {
     email: null,
     practicesMode: null,
   };
+
   const initDoubleModalValues: IManageDocument = {
     studentName: null,
     documentName: null,
@@ -252,112 +257,132 @@ export default function Students() {
     setDoubleModalOpen(!doubleModalOpen);
   };
 
-  const handleManageDocument = (idx: number) => {
-    const itemFound = studentList.find((x) => x.student_id === idx);
+  const handleManageDocument = (idx: number, docId: number) => {
+    const itemFound = processList.find((x) => x.process_id === idx);
+    const docFound = itemFound
+      ? itemFound.Etapa.find((y) => y.type_id === docId)
+      : null;
     console.log(itemFound);
+    console.log(docFound);
     const documentFound: IManageDocument = {
-      studentName: itemFound!.Persona?.name + " " + itemFound!.Persona?.surname,
-      documentName: itemFound!.Proceso[0]?.Etapa[0].filename,
+      studentName:
+        itemFound!.Estudiante.Persona?.name +
+        " " +
+        itemFound!.Estudiante.Persona?.surname,
+      documentName: docFound?.filename!,
     };
     setSelectedDocumentData(documentFound);
     setDoubleModalOpen(true);
   };
 
+  const [isLoadingManageDocument, setIsLoadingManageDocument] = useState(false);
+
   return (
-    <div className="h-full">
+    <>
+      <DoubleModal isOpen={doubleModalOpen} onClose={handleDoubleModalToggle}>
+        <ManageDocument
+          studentName={selectedDocumentData.studentName}
+          documentName={selectedDocumentData.documentName}
+          onClose={handleDoubleModalToggle}
+          isLoading={isLoadingManageDocument}
+        />
+      </DoubleModal>
+
       <Modal isOpen={modalOpen} onClose={handleModalToggle}>
         <InfoStudent {...selectedStudentData} />
       </Modal>
-      <DoubleModal isOpen={doubleModalOpen} onClose={handleDoubleModalToggle}>
-        <div className="w-[70%] rounded-l-lg bg-[#404040]">
-          {/* aqui pon el componente de  la previsualización */}
-        </div>
-        <div className="w-[30%]">
-          <ManageDocument
-            studentName={selectedDocumentData.studentName}
-            documentName={selectedDocumentData.documentName}
-            onClose={handleDoubleModalToggle}
-          />
-        </div>
-      </DoubleModal>
 
-      <StudentDocumentPreview />
-      <div className="flex h-full flex-col gap-8">
-        <div className="flex items-stretch justify-end gap-4">
-          <div className="flex overflow-hidden rounded-lg ">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => handleSearchTermChange(e.target.value)}
-              className=" px-4 py-2 placeholder:text-sm placeholder:font-light placeholder:text-[#C4C4C4] focus:outline-none"
-              placeholder="Buscar..."
-            />
-            <button className="h-full bg-[#FF9853] px-4 text-white ">
-              <MagnifyingGlassIcon className="h-4 w-4" />
+      <div className="h-full">
+        <div className="flex h-full flex-col gap-8">
+          <div className="flex items-stretch justify-end gap-4">
+            <div className="flex overflow-hidden rounded-lg ">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => handleSearchTermChange(e.target.value)}
+                className=" px-4 py-2 placeholder:text-sm placeholder:font-light placeholder:text-[#C4C4C4] focus:outline-none"
+                placeholder="Buscar..."
+              />
+              <button className="h-full bg-[#FF9853] px-4 text-white ">
+                <MagnifyingGlassIcon className="h-4 w-4" />
+              </button>
+            </div>
+            <button className="min-h-full rounded-lg bg-[#FF9853] px-4 text-white">
+              <FunnelIcon className="h-4 w-4" />
             </button>
           </div>
-          <button className="min-h-full rounded-lg bg-[#FF9853] px-4 text-white">
-            <FunnelIcon className="h-4 w-4" />
-          </button>
-        </div>
 
-        <div className="flex flex-col gap-4 ">
-          <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
-            <div>Código</div>
-            <div>Nombre Completo</div>
-            <div>E.P.</div>
-            <div>Ciclo</div>
-            <div>Estado</div>
-            <div>Supervisor</div>
-            <div>Tiempo</div>
-            <div>Opciones</div>
-          </div>
+          <div className="flex flex-col gap-4 ">
+            <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
+              <div>Código</div>
+              <div>Nombre Completo</div>
+              <div>E.P.</div>
+              <div>Ciclo</div>
+              <div>Estado</div>
+              <div>Supervisor</div>
+              <div>Tiempo</div>
+              <div>Opciones</div>
+            </div>
 
-          {filteredData.length === 0 ? (
-            <div className="rounded-[0.625rem] bg-[#D1D1D1]">
-              <div className="grid grid-cols-1 items-center rounded-[0.625rem] bg-white px-4 py-6 text-center text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                <div>
-                  No se encontraron registros que coincidan con el filtro.
+            {filteredData.length === 0 ? (
+              <div className="rounded-[0.625rem] bg-[#D1D1D1]">
+                <div className="grid grid-cols-1 items-center rounded-[0.625rem] bg-white px-4 py-6 text-center text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                  <div>
+                    No se encontraron registros que coincidan con el filtro.
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <>
-              {currentData.map((student, studentIndex) => (
-                <div
-                  key={studentIndex}
-                  className="rounded-[0.625rem] bg-[#D1D1D1]"
-                >
-                  <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                    <div>{student.code}</div>
-                    <div>
-                      {student.Persona.name + " " + student.Persona.surname}
+            ) : (
+              <>
+                {currentData.map((item, itemIndex) => (
+                  <div
+                    key={itemIndex}
+                    className="rounded-[0.625rem] bg-[#D1D1D1]"
+                  >
+                    <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                      <div>{item.Estudiante.code}</div>
+                      <div>
+                        {item.Estudiante.Persona.name +
+                          " " +
+                          item.Estudiante.Persona.surname}
+                      </div>
+                      <div>{item.Estudiante.School.name}</div>
+                      <div>
+                        {intToRoman(Number(item.Estudiante.Cycle.cycle))}
+                      </div>
+                      <div>
+                        <StudentStatusFlag
+                          status={Number(item.Estudiante.state)}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <UserIcon className="h-4 w-4" />{" "}
+                        {item.Supervisor.Docente.Persona.name +
+                          " " +
+                          item.Supervisor.Docente.Persona.surname}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ClockIcon className="h-4 w-4" /> 4M
+                      </div>
+                      <div className="rounded-r-lg">
+                        <ProcessOptions itemIndex={item.process_id} />
+                      </div>
                     </div>
-                    <div>{student.School.name}</div>
-                    <div>{intToRoman(Number(student.Cycle.cycle))}</div>
-                    <div>
-                      <StudentStatusFlag status={Number(student.state)} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <UserIcon className="h-4 w-4" />{" "}
-                      {student.Proceso[0]?.Supervisor.Docente.Persona.name +
-                        " " +
-                        student.Proceso[0]?.Supervisor.Docente.Persona.surname}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <ClockIcon className="h-4 w-4" /> 4M
-                    </div>
-                    <div className="rounded-r-lg">
-                      <StudentOptions itemIndex={student.student_id} />
-                    </div>
-                  </div>
-                  {student.show && (
-                    <div className="flex items-center gap-4  rounded-b-lg p-4">
-                      {student.Proceso[0]?.Etapa.map(
-                        (document: IEtapa, documentIndex) => (
+                    {item.show && (
+                      <div className="flex items-center gap-4  rounded-b-lg p-4">
+                        {item.Etapa.map((document: IEtapa, documentIndex) => (
                           <div
                             key={documentIndex}
-                            className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
+                            className={`flex items-center gap-2 rounded-[0.625rem] px-4 py-3 
+                              
+                              ${
+                                document.state === "0"
+                                  ? "bg-[#FFFFFF] text-[#757575]"
+                                  : document.state === "1"
+                                    ? "bg-[#55E38E] text-white "
+                                    : "bg-[#FE7272] text-white "
+                              }
+                              `}
                           >
                             <PDFIcon className=" h-6 w-6 flex-none" />
                             <div>
@@ -365,81 +390,105 @@ export default function Students() {
                                 {document.Tipo.name}
                               </div>
                               <div className="text-[0.4375rem] font-light">
-                                Validado
+                                {document.state === "0"
+                                  ? "Pendiente"
+                                  : document.state === "1"
+                                    ? "Validado"
+                                    : "Rechazado"}
                               </div>
                             </div>
                             <button
                               onClick={() =>
-                                handleManageDocument(student.student_id)
+                                handleManageDocument(
+                                  item.process_id,
+                                  document.type_id,
+                                )
                               }
                               className="h-6 w-6 rounded-lg p-1 hover:bg-white/20"
                             >
                               <EyeIcon />
                             </button>
                           </div>
-                        ),
-                      )}
-                    </div>
-                  )}
+                          // <div
+                          //   key={documentIndex}
+                          //   className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
+                          // >
+                          //   <PDFIcon className=" h-6 w-6 flex-none" />
+                          //   <div>
+                          //     <div className="whitespace-nowrap text-[0.625rem] font-bold">
+                          //       {document.Tipo.name}
+                          //     </div>
+                          //     <div className="text-[0.4375rem] font-light">
+                          //       Validado
+                          //     </div>
+                          //   </div>
+                          //   <button onClick={() => handleManageDocument(item.process_id, document.type_id)} className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
+                          //     <EyeIcon />
+                          //   </button>
+                          // </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+
+          {filteredData.length !== 0 && (
+            <>
+              <div className="flex items-center justify-between">
+                <div className="text-[0.625rem] text-[#757575]">
+                  {" "}
+                  {`${startIndex + 1} - ${Math.min(
+                    endIndex,
+                    filteredData.length,
+                  )} de ${filteredData.length}`}{" "}
                 </div>
-              ))}
-            </>
-          )}
-        </div>
 
-        {filteredData.length !== 0 && (
-          <>
-            <div className="flex items-center justify-between">
-              <div className="text-[0.625rem] text-[#757575]">
-                {" "}
-                {`${startIndex + 1} - ${Math.min(
-                  endIndex,
-                  filteredData.length,
-                )} de ${filteredData.length}`}{" "}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={currentPage === 1}
-                  className={`h-[1.5rem] w-[1.5rem] p-0.5
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={currentPage === 1}
+                    className={`h-[1.5rem] w-[1.5rem] p-0.5
             ${currentPage === 1 ? "text-[#bababa]" : "text-[#FF9853]"}`}
-                  onClick={() => goToPreviousPage()}
-                >
-                  <ChevronLeftIcon />
-                </button>
-                <div className="flex items-center ">
-                  {Array.from({ length: totalPages }, (_, index) => (
-                    <button
-                      key={index}
-                      className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
+                    onClick={() => goToPreviousPage()}
+                  >
+                    <ChevronLeftIcon />
+                  </button>
+                  <div className="flex items-center ">
+                    {Array.from({ length: totalPages }, (_, index) => (
+                      <button
+                        key={index}
+                        className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
                 ${
                   currentPage == index + 1
                     ? "bg-[#FF9853] text-white"
                     : "text-[#757575]"
                 }`}
-                      onClick={() => handlePageChange(index + 1)}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={() => goToNextPage()}
-                  disabled={currentPage === totalPages}
-                  className={`h-[1.5rem] w-[1.5rem] p-0.5
+                        onClick={() => handlePageChange(index + 1)}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => goToNextPage()}
+                    disabled={currentPage === totalPages}
+                    className={`h-[1.5rem] w-[1.5rem] p-0.5
               
               ${
                 currentPage === totalPages ? "text-[#bababa]" : "text-[#FF9853]"
               }`}
-                >
-                  <ChevronRightIcon />
-                </button>
+                  >
+                    <ChevronRightIcon />
+                  </button>
+                </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

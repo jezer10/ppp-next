@@ -14,11 +14,10 @@ function Modal({ isOpen, onClose, children }: ModalProps) {
     return (
         <>
             {isOpen && (
-                <>
-                    <div 
-                        onClick={onClose} 
-                        className="bg-[#313131]/80  w-[100vw] h-[100vh] top-0 left-0 right-0 bottom-0 fixed z-50"></div>
-                    <div className="bg-white  md:w-[90%] lg:w-[40%] h-[60%] rounded-lg absolute p-6 z-[51] inset-0 m-auto">
+                <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center z-[999]">
+                    <div className="bg-[#313131]/80 w-full h-full absolute"></div>
+
+                    <div className="bg-white md:w-[90%] lg:w-[40%] h-[60%] rounded-lg p-8 z-[51]">
                         <div className='w-full flex justify-end'>
                             <button onClick={onClose} className="hover:bg-slate-100 rounded-lg p-1">
                                 <XMarkIcon className="h-4 w-4"></XMarkIcon>
@@ -26,7 +25,7 @@ function Modal({ isOpen, onClose, children }: ModalProps) {
                         </div>
                         {children}
                     </div>
-                </>
+                </div>
             )}
         </>
     )

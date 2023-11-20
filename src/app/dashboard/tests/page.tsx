@@ -1,8 +1,11 @@
 "use client";
-
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
+<<<<<<< HEAD
 import { IApiResponse } from "../students/interfaces/student";
+=======
+import { IApiResponse } from "../students/interfaces/process";
+>>>>>>> master
 import { ITool } from "./interfaces/tool";
 import { Menu, Transition } from "@headlessui/react";
 import {
@@ -11,12 +14,19 @@ import {
   ChevronLeftIcon,
   ChevronDownIcon,
   TrashIcon,
+<<<<<<< HEAD
   ClipboardDocumentListIcon,
+=======
+>>>>>>> master
   PencilSquareIcon,
   PlusCircleIcon,
 } from "@heroicons/react/20/solid";
 import ManageTool from "./components/ManageTool";
+<<<<<<< HEAD
 import config from "@/config";
+=======
+import { config } from "@/config";
+>>>>>>> master
 import { ConfirmAlert, SuccessAlert } from "@/components/Alert";
 
 const fetcher = async (url: string) => {
@@ -40,6 +50,10 @@ export default function Tests() {
   }, [toolData]);
 
   const toolOptionsItems = [
+<<<<<<< HEAD
+=======
+    // { icon: ClipboardDocumentListIcon, name: "Detalle", actionFunction: (idx: number) => { } },
+>>>>>>> master
     {
       icon: ClipboardDocumentListIcon,
       name: "Detalle",
@@ -130,7 +144,10 @@ export default function Tests() {
   };
 
   const goToPreviousPage = () => {
+<<<<<<< HEAD
     console.log(currentPage);
+=======
+>>>>>>> master
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
@@ -191,9 +208,14 @@ export default function Tests() {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+<<<<<<< HEAD
         },
       });
       console.log(response);
+=======
+        }
+      })
+>>>>>>> master
       setSelectedToolID(null);
       setIsOpenConfirm(false);
       setIsLoading(false);
@@ -205,9 +227,14 @@ export default function Tests() {
   };
 
   const manageToolSuccess = (message: string) => {
+<<<<<<< HEAD
     console.log(message);
     setIsOpenSuccessManage({ state: true, message: message });
   };
+=======
+    setIsOpenSuccessManage({ state: true, message: message })
+  }
+>>>>>>> master
 
   if (manageToolComponent) {
     return (
