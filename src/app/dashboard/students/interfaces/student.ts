@@ -3,7 +3,7 @@ interface IPersona {
   surname: string;
   email: string | null;
   dni: string;
-  phone:string;
+  phone: string;
 }
 
 interface ICycle {
@@ -23,14 +23,14 @@ interface ISchool {
 }
 
 interface IEtapa {
-    filename:string;
-    path:string;
-    state:string;
-    Tipo:IEtapaTipo;
+  filename: string;
+  path: string;
+  state: string;
+  Tipo: IEtapaTipo;
 }
 
 interface IEtapaTipo {
-    name:string;
+  name: string;
 }
 
 interface IApiResponse<T> {
@@ -61,7 +61,7 @@ interface IStudent {
   Persona: IPersona;
   School: ISchool;
   Proceso: IProceso[];
-  show:boolean
+  show: boolean;
 }
 
-// export type { IApiResponse, IStudent, IEtapa};
+export type { IApiResponse, IStudent, IEtapa };

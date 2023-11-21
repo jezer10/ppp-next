@@ -1,4 +1,4 @@
-import { config } from "@/config";
+import config from "@/config";
 
 const URL_APIS = config.BACK_URL;
 export const getAllSupervisorService = async () => {
@@ -17,16 +17,13 @@ export const changeStateStudentService = async (
   supervisor_id: any,
   student_id: number,
 ) => {
-  const response = await fetch(
-    `${URL_APIS}/supervisor/${student_id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ supervisor_id, student_id }),
+  const response = await fetch(`${URL_APIS}/supervisor/${student_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({ supervisor_id, student_id }),
+  });
   const data = await response.json();
   return data;
 };

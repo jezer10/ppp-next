@@ -1,8 +1,4 @@
 "use client";
-import Image from "next/image";
-import log_sis from "@/../public/logo_sistemas.png";
-import log_adv from "@/../public/logo_adventista.png";
-import log_grp from "@/../public/group.svg";
 import {
   UserIcon,
   CheckIcon,
@@ -10,18 +6,23 @@ import {
   EyeIcon,
   EyeSlashIcon,
 } from "@heroicons/react/24/solid";
-
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
-import { getSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { ToastContainer, toast } from "react-toastify";
+
+import Image from "next/image";
+import log_sis from "@/../public/logo_sistemas.png";
+import log_adv from "@/../public/logo_adventista.png";
+import log_grp from "@/../public/group.svg";
+
+import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
   const [visible, setVisible] = useState(false);
   const router = useRouter();
   const [form, setForm] = useState({
-    username: "kevinapps",
+    username: "flora",
     password: "12345678",
   });
 

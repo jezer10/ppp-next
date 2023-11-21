@@ -23,7 +23,6 @@ export default function DashboardLayout({
   const [step, setStep] = useState(1);
   const URL_APIS = config.BACK_URL;
 
-
   const validateFirstScreen = async () => {
     const userId = user?.user_id;
     if (userId && userId > 0) {
@@ -75,9 +74,11 @@ export default function DashboardLayout({
   });
 
   if (!user) {
-    return <div className='h-[100vh]'>
-    <LoadingComponent/>
-  </div>
+    return (
+      <div className="h-[100vh]">
+        <LoadingComponent />
+      </div>
+    );
   }
 
   if (!viewed) {
@@ -207,7 +208,7 @@ export default function DashboardLayout({
           <div className="text-[#757575]">
             <div className="text-2xl font-bold">Inicio</div>
             <div className="text-sm">
-              Bienvenido,{" "}
+              Bienvenido,
               <span className="font-bold">
                 {`${user.name} ${user.surname}`}
               </span>
@@ -226,7 +227,7 @@ export default function DashboardLayout({
             </button>
           </div>
         </header>
-        <section className="">{children}</section>
+        <section>{children}</section>
       </main>
     </div>
   );

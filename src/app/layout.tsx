@@ -1,9 +1,8 @@
 import { siteConfig } from "@/config/site";
 import { NextAuthProvider } from "@/providers/NextAuthProvider";
-import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
-//import { ClerkProvider } from "@clerk/nextjs";
+import "@/styles/globals.css";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],

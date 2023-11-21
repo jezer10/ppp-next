@@ -1,7 +1,9 @@
-import Image from "next/image";
 import { Bayon } from "next/font/google";
-import nov_img from "../../../public/novedades.png";
 import { BellIcon } from "@heroicons/react/24/solid";
+
+import Image from "next/image";
+import nov_img from "@/../public/novedades.png";
+
 const bayon = Bayon({ subsets: ["latin"], weight: ["400"] });
 
 export default function Dashboard() {

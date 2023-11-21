@@ -4,19 +4,15 @@ import image_18 from "@public/image_18.svg";
 import image_17 from "@public/image_17.svg";
 import image_16 from "@public/image_16.svg";
 import { useInformation } from "@/lib/hooks/useInformation";
-import React from "react";
+import React, { useEffect } from "react";
 import config from "@/config";
 
 function Page() {
-  const { user_data, loading } = useInformation();
+  const { loading, user } = useInformation();
   const URL_APIS = config.BACK_URL;
 
-  validarIntroduccionVista();
-
   async function validarIntroduccionVista() {
-    const userId = user_data[0].user_id;
-    const introduccion_visto: boolean = false;
-
+    const userId = user?.user_id;
     if (userId > 0) {
       const response = await fetch(
         URL_APIS + "/student/introduccion_visto/" + userId,
@@ -30,8 +26,13 @@ function Page() {
       );
 
       const data = await response.json();
+      console.log(data);
     }
   }
+
+  useEffect(() => {
+    validarIntroduccionVista();
+  });
   return (
     // <section className="mx-[67px] mt-[35px]">
     //     <section className="">
