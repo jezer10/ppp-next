@@ -8,7 +8,7 @@ export default withAuth(async function middleware(req: NextRequestWithAuth) {
   let info_user = req.nextauth.token;
   let { info } = info_user?.user as any;
   let { user, roles } = info;
-  // console.log(info);
+  console.log(info);
 
   const access = await AccessAuthService(roles[0].role_id);
   // console.log(access);
