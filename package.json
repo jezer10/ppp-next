@@ -30,7 +30,7 @@
     "eslint-config-next": "^13.4.10",
     "file-saver": "^2.0.5",
     "firebase": "^10.4.0",
-    "jszip-utils": "^0.1.0",
+    "framer-motion": "^10.16.4",
     "next": "^13.4.10",
     "next-auth": "^4.23.2",
     "pdf-lib": "^1.17.1",
@@ -39,14 +39,18 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.47.0",
     "react-pdf": "^7.5.0",
+    "react-responsive": "^9.0.2",
+    "react-router-dom": "^6.17.0",
     "react-toastify": "^9.1.3",
-    "swr": "^2.2.0"
+    "swr": "^2.2.0",
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",
     "@types/node": "^20.4.2",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
+    "@types/react-router-dom": "^5.3.3",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.45.0",
     "postcss": "^8.4.26",

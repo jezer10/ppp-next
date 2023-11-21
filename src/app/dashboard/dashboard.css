@@ -2,3 +2,8 @@
   @apply w-full h-24;
   clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 0% 80%);
 }
+
+.flagg_min {
+  @apply w-full h-24;
+  clip-path: polygon(0% 0%, 100% 0%, 80% 80%, 0% 80%);
+}
