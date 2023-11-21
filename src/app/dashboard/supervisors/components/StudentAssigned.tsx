@@ -18,9 +18,10 @@ export const StudentAssugnet = ({ data, supervisor , listStudentsAssigments, fet
         ASIGNAR PRACTICANTES
       </h1>
       <div className="flex flex-col gap-2 ">
-        <div className="grid grid-cols-3 items-center rounded-[0.625rem] bg-[#FF9853] px-4 py-3 text-left text-[0.6875rem] font-medium text-white">
+        <div className="grid grid-cols-4 items-center rounded-[0.625rem] bg-[#FF9853] px-4 py-3 text-left text-[0.6875rem] font-medium text-white">
           <div>Código</div>
           <div>Nombre Completo</div>
+          <div>Correo</div>
           <div>Estado de Asignación</div>
         </div>
 
@@ -36,11 +37,12 @@ export const StudentAssugnet = ({ data, supervisor , listStudentsAssigments, fet
           <>
             {data.map((item: any, itemIndex: any) => (
               <div key={itemIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
-                <div className="grid grid-cols-3 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-black shadow ">
+                <div className="grid grid-cols-4 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-black shadow ">
                   <div>{item.code}</div>
                   <div>
                     {item.name.toUpperCase() + " " + item.surname.toUpperCase()}
                   </div>
+                  <div>{item.email}</div>
                   <div
                     className={`w-[100%] flex justify-center items-center`}
                   >
