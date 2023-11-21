@@ -12,7 +12,6 @@ export default withAuth(async function middleware(req: NextRequestWithAuth) {
 
   let access_names =
     access && access.map((ac: any) => "/dashboard" + (ac.url || ""));
-  let roles_names = roles.map((role: any) => role.name);
 
   if (!access_names.includes(req.nextUrl.pathname)) {
     return NextResponse.rewrite(new URL("/dashboard", req.url));

@@ -33,7 +33,8 @@ const Sidebar = () => {
 
   async function getAccess() {
     const { access } = await AccessAuthService(roles[0].role_id);
-    setMenuItems(access.filter((e: any) => e.father_id == null));
+    console.log(access);
+    setMenuItems(access);
   }
 
   useEffect(() => {
@@ -87,9 +88,11 @@ const Sidebar = () => {
 
   return (
     <div>
+      {/* Cerrar sidebar en vista móvil clickando afuera*/}
+
       <div
         onClick={() => setOpen(false)}
-        className={`fixed inset-0 z-10 max-h-screen bg-black/50 md:hidden ${
+        className={`fixed inset-0 z-[900] max-h-screen bg-black/50 md:hidden ${
           open ? "block" : "hidden"
         }`}
       ></div>
@@ -99,7 +102,9 @@ const Sidebar = () => {
         variants={Nav_animation}
         initial={{ x: isTabletMid ? -250 : 0 }}
         animate={open ? "open" : "closed"}
-        className="text-gray max-w-80 fixed z-20 w-80 gap-8 overflow-y-auto bg-white shadow-xl  md:relative"
+        className="text-gray max-w-80 fixed z-[901] flex h-full w-80 flex-none flex-col 
+        
+        gap-8 overflow-y-auto  bg-white shadow-xl md:relative"
       >
         <div className="relative">
           <div
@@ -147,28 +152,31 @@ const Sidebar = () => {
         >
           <nav>
             <ul className="flex flex-col gap-2">
-              {menuItems.map((e: any, index) => {
-                const path = `/dashboard${e.url || ""}`;
-                const isActive =
-                  e.url === null
-                    ? pathname === path
-                    : pathname.startsWith(path);
-                return (
-                  <li key={index}>
-                    <Link
-                      href={path}
-                      className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${
-                        isActive
-                          ? "bg-[#FF9853] font-bold text-white"
-                          : "text-[#C4C4C4]"
-                      }`}
-                    >
-                      <DynamicHeroIcon icon={e.icon} />
-                      {(open || (!open && isTabletMid)) && <div>{e.name}</div>}
-                    </Link>
-                  </li>
-                );
-              })}
+              {menuItems.length !== 0 &&
+                menuItems.map((item: any, index) => {
+                  const path = `/dashboard${item.url || ""}`;
+                  const isActive =
+                    item.url === null
+                      ? pathname === path
+                      : pathname.startsWith(path);
+                  return (
+                    <li key={index}>
+                      <Link
+                        href={path}
+                        className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${
+                          isActive
+                            ? "bg-[#FF9853] font-bold text-white"
+                            : "text-[#C4C4C4]"
+                        }`}
+                      >
+                        <DynamicHeroIcon icon={item.icon} />
+                        {(open || (!open && isTabletMid)) && (
+                          <div>{item.name}</div>
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
             </ul>
           </nav>
           {/* Icono para abrir y cerrar el sidebar en desktop */}
@@ -228,6 +236,11 @@ const Sidebar = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Icono en mobile para abrir el sidebar */}
+      <div className="m-3 md:hidden" onClick={() => setOpen(true)}>
+        <Bars3Icon className="h-4 w-4" />
+      </div>
     </div>
   );
 };
