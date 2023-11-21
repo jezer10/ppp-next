@@ -55,7 +55,7 @@ function Page() {
   return (
     <>
       <PresentationLetterModal
-        isOpen={true}
+        isOpen={isModalOpen}
         closeAction={() => setIsModalOpen(false)}
       />
       <div className="flex space-x-4">

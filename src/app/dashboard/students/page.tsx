@@ -13,13 +13,13 @@ import {
   ClockIcon,
 } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useRef, useState } from "react";
-import useSWR from "swr";
+import { Fragment, useEffect, useState } from "react";
 import { IApiResponse, IEtapa, IProcess } from "./interfaces/process";
 import { intToRoman } from "@/utils/romanConverter";
 import Modal from "@/components/Modal";
 import InfoStudent from "./components/InfoStudent";
 import { IManageDocument, IModalProps } from "./interfaces/modal";
+import { IStudent } from "./interfaces/student";
 import DoubleModal from "@/components/DoubleModal";
 import ManageDocument from "./components/ManageDocument";
 import { ProcessService } from "@/services/process.service";
@@ -199,13 +199,11 @@ export default function Students() {
 
   // Cambia de página
   const handlePageChange = (page: any) => {
-    console.log(page);
     setCurrentPage(page);
   };
 
   // Cambia de página hacia atrás
   const goToPreviousPage = () => {
-    console.log(currentPage);
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }

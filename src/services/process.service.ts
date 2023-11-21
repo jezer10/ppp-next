@@ -18,6 +18,7 @@ export const ProcessService = {
       }
 
       const students = await response.json();
+      console.log(students);
       return students;
     } catch (error) {
       console.error("Error en ProcessService.getAllProcesses:", error);

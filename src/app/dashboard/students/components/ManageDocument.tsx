@@ -43,7 +43,6 @@ function ManageDocument(props: IManageDocument) {
           <div className="flex flex-col gap-5">
             <div className="flex w-full flex-col">
               <span className="text-sm font-semibold text-[#7e7e7e]">
-                {" "}
                 Alumno
               </span>
               <span className="text-sm text-[#bababa]">
@@ -52,7 +51,6 @@ function ManageDocument(props: IManageDocument) {
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-[#7e7e7e]">
-                {" "}
                 Nombre del archivo
               </span>
               <span className="text-sm text-[#bababa]">
@@ -61,7 +59,6 @@ function ManageDocument(props: IManageDocument) {
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-[#7e7e7e]">
-                {" "}
                 Observaciones:
               </span>
               <textarea
@@ -85,8 +82,7 @@ function ManageDocument(props: IManageDocument) {
               onClick={props.onClose}
               className="cursor-pointer p-3 text-center"
             >
-              {" "}
-              Volver{" "}
+              Volver
             </span>
           </div>
         </div>
