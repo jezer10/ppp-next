@@ -33,7 +33,6 @@ const Sidebar = () => {
 
   async function getAccess() {
     const { access } = await AccessAuthService(roles[0].role_id);
-    console.log(access);
     setMenuItems(access);
   }
 
