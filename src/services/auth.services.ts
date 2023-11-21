@@ -20,7 +20,7 @@ export async function LoginAuthService(credentials: User) {
 }
 
 export async function AccessAuthService(roleId: string) {
-  const api = await fetch(`${URL_APIS}/rol/${roleId}`);
-  const response = await api.json();
-  return response;
+  const response = await fetch(`${URL_APIS}/rol/${roleId}`);
+  const { data: access, status } = await response.json();
+  return { status, access };
 }

@@ -15,11 +15,11 @@ export default function PresentationLetterModal({
   });
   return (
     isOpen && (
-      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-black/40">
-        <div className="relative flex w-full max-w-3xl flex-col gap-4 rounded-lg bg-white px-12 py-8">
+      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-black/40 px-4">
+        <div className="relative flex w-full max-w-3xl flex-col gap-4 rounded-lg bg-white p-4 sm:px-12 sm:py-8">
           <button
             onClick={closeAction}
-            className="absolute right-4 top-4 rounded-full p-2 hover:bg-black/10"
+            className="absolute right-4 top-4 rounded-full sm:p-2 hover:bg-black/10"
           >
             <XMarkIcon className="h-4 w-4" />
           </button>

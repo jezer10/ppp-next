@@ -3,27 +3,27 @@ import { BellIcon } from "@heroicons/react/24/solid";
 
 import Image from "next/image";
 import nov_img from "@/../public/novedades.png";
-
+import topography from "@/../public/topography.svg";
 const bayon = Bayon({ subsets: ["latin"], weight: ["400"] });
 
 export default function Dashboard() {
   return (
     <div className="flex h-full flex-col gap-4">
-      <div className="relative px-8 pb-4 pt-8  text-white">
-        <div className={`${bayon.className} `}>
-          <div className="absolute inset-0 -z-10 overflow-hidden rounded-lg bg-gradient-to-r from-[#FD6500] to-[#FF802C]">
+      <div className="relative rounded-xl bg-gradient-to-r from-[#FD6500] to-[#FF802C] px-8  pb-8 pt-12 text-white">
+        <div className={`${bayon.className}`}>
+          <div className="absolute inset-0  ">
             <div className="relative">
               <span
-                className={` absolute -top-2 left-0  bg-gradient-to-r from-[#FF8F44]  to-white bg-clip-text text-6xl tracking-[1.5rem] text-transparent opacity-30`}
+                className={` absolute -left-1 -top-3  text-8xl  tracking-[1.5rem] text-white/10  `}
               >
-                novedades
+                Novedades
               </span>
             </div>
           </div>
-          <div className=" text-7xl leading-10">novedades</div>
+          <div className=" text-8xl leading-[3.5rem]">Novedades</div>
         </div>
-        <div className="mt-2 text-xs">
-          Ahora podrás gestionar y monitoriar las PPP de los estudiantes desde
+        <div className="mt-2 font-sans text-sm font-thin">
+          Ahora podrás gestionar y monitorizar las PPP de los estudiantes desde
           donde éstes.
         </div>
         <Image
@@ -42,27 +42,33 @@ export default function Dashboard() {
           />
         ))}
       </div>
-      <div className="grid  h-full w-full grid-cols-3 gap-12 font-bold text-white">
-        {[1, 2, 3].map((e) => (
+      <div className="grid h-full w-full grid-cols-3 gap-12 font-bold text-white">
+        {[1, 2, 3].map((element, idx) => (
           <div
-            key={e}
-            className="relative flex flex-col overflow-hidden rounded bg-[#FBD54F]"
+            key={idx}
+            className="relative  overflow-hidden rounded-lg bg-[#FBD54F]"
           >
-            <div className="flex h-full flex-col justify-between p-4">
-              <div className="h-16 w-16 rounded-full border border-dashed border-white p-2">
-                <BellIcon />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="text-6xl">312</div>
-                <div className="text-xs">
-                  <div>Practicantes</div>
-                  <div>Confirmados</div>
+            <img
+              src="/topography.svg"
+              className="absolute inset-0 h-full w-full object-cover text-white"
+            />
+            <div className="absolute inset-0 flex h-full flex-col ">
+              <div className=" flex h-full flex-col justify-between p-4">
+                <div className="h-16 w-16 rounded-full border-2 border-dashed border-white p-3">
+                  <BellIcon />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="text-6xl">312</div>
+                  <div className="text-xs">
+                    <div>Practicantes</div>
+                    <div>Confirmados</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-[#7B6208] p-8">
-              <div className="text-2xl">154</div>
-              <div className="text-xs">Practicantes sin confirmar</div>
+              <div className="bg-[#7B6208] p-8">
+                <div className="text-2xl">154</div>
+                <div className="text-xs">Practicantes sin confirmar</div>
+              </div>
             </div>
           </div>
         ))}

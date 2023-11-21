@@ -227,7 +227,7 @@ export default function DashboardLayout({
             </button>
           </div>
         </header>
-        <section>{children}</section>
+        <section className="h-full">{children}</section>
       </main>
     </div>
   );
