@@ -4,8 +4,7 @@ import { AccessAuthService } from "./services";
 
 export default withAuth(async function middleware(req: NextRequestWithAuth) {
   let payload = req.nextauth.token;
-  let { roles, ...user } = payload?.user as any;
-  const [role] = roles;
+  let { role } = payload?.user as any;
   const { access, status } = await AccessAuthService(role?.role_id);
 
   if (status !== 200) return NextResponse.rewrite(new URL("/", req.url));

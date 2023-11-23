@@ -1,9 +1,8 @@
 import { Bayon } from "next/font/google";
 import { BellIcon } from "@heroicons/react/24/solid";
-
 import Image from "next/image";
-import nov_img from "@/../public/novedades.png";
-import topography from "@/../public/topography.svg";
+import nov_img from "@public/novedades.png";
+import TopographyPattern from "@/components/icons/TopographyPattern";
 const bayon = Bayon({ subsets: ["latin"], weight: ["400"] });
 
 export default function Dashboard() {
@@ -48,10 +47,7 @@ export default function Dashboard() {
             key={idx}
             className="relative  overflow-hidden rounded-lg bg-[#FBD54F]"
           >
-            <img
-              src="/topography.svg"
-              className="absolute inset-0 h-full w-full object-cover text-white"
-            />
+            <TopographyPattern className="h-full text-[#BC9C2C] " />
             <div className="absolute inset-0 flex h-full flex-col ">
               <div className=" flex h-full flex-col justify-between p-4">
                 <div className="h-16 w-16 rounded-full border-2 border-dashed border-white p-3">
@@ -65,7 +61,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="bg-[#7B6208] p-8">
+              <div className="bg-[#7B6208]/50 p-8">
                 <div className="text-2xl">154</div>
                 <div className="text-xs">Practicantes sin confirmar</div>
               </div>

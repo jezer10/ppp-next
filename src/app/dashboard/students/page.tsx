@@ -23,12 +23,32 @@ import { IStudent } from "./interfaces/student";
 import DoubleModal from "@/components/DoubleModal";
 import ManageDocument from "./components/ManageDocument";
 import { ProcessService } from "@/services/process.service";
+import PDFIcon from "@/components/icons/PDFIcon";
 
-const fetcher = async (url: string) => {
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
-};
+function StudentStatusFlag({ status }: { status: number }) {
+  return (
+    <span
+      className={`rounded px-2 py-0.5  text-white ${
+        status === 0
+          ? "bg-[#29EB77]"
+          : status === 1
+            ? "bg-[#FFC700]"
+            : status === 2
+              ? "bg-[#FC6767]"
+              : "bg-[#49D3FE]"
+      }`}
+    >
+      {status === 0
+        ? "En prácticas"
+        : status === 1
+          ? "Pendiente"
+          : status === 2
+            ? "Sin Confirmar"
+            : "Finalizado"}
+    </span>
+  );
+}
+
 export default function Students() {
   const [studentList, setStudentList] = useState<IStudent[]>([]);
   const [processList, setProcessList] = useState<IProcess[]>([]);
@@ -50,12 +70,9 @@ export default function Students() {
       name: "Info Estudiante",
       actionFunction: (idx: number) => {
         const itemFound = processList.find((x) => x.process_id === idx);
-        console.log(itemFound);
         const studentFound: IModalProps = {
-          fullName:
-            itemFound!.Estudiante.Persona?.name +
-            " " +
-            itemFound!.Estudiante.Persona?.surname,
+          fullName: `${itemFound!.Estudiante.Persona?.name} ${itemFound!
+            .Estudiante.Persona?.surname}`,
           codeStudent: itemFound!.Estudiante.code,
           cycle: itemFound!.Estudiante.Cycle?.cycle,
           school: itemFound!.Estudiante.School?.name,
@@ -131,34 +148,6 @@ export default function Students() {
           </Menu.Items>
         </Transition>
       </Menu>
-    );
-  }
-
-  // Estado de estudiante 0 : Estudiante esta actualmente en un proceso de prácticas pre profesionales
-  // 1: ................
-  // Quiza este status flasg no es necesario, aca puede ser En Prácticas y Finalizado, no más.
-  // Pendiente?,, Sin confirmar?
-  function StudentStatusFlag({ status }: { status: number }) {
-    return (
-      <span
-        className={`rounded px-2 py-0.5  text-white ${
-          status === 0
-            ? "bg-[#29EB77]"
-            : status === 1
-              ? "bg-[#FFC700]"
-              : status === 2
-                ? "bg-[#FC6767]"
-                : "bg-[#49D3FE]"
-        }`}
-      >
-        {status === 0
-          ? "En prácticas"
-          : status === 1
-            ? "Pendiente"
-            : status === 2
-              ? "Sin Confirmar"
-              : "Finalizado"}
-      </span>
     );
   }
 
@@ -241,6 +230,7 @@ export default function Students() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [doubleModalOpen, setDoubleModalOpen] = useState(false);
+  const [isLoadingManageDocument, setIsLoadingManageDocument] = useState(false);
 
   const [selectedStudentData, setSelectedStudentData] =
     useState<IModalProps>(initModalValues);
@@ -260,20 +250,15 @@ export default function Students() {
     const docFound = itemFound
       ? itemFound.Etapa.find((y) => y.type_id === docId)
       : null;
-    console.log(itemFound);
-    console.log(docFound);
+
     const documentFound: IManageDocument = {
-      studentName:
-        itemFound!.Estudiante.Persona?.name +
-        " " +
-        itemFound!.Estudiante.Persona?.surname,
+      studentName: `${itemFound!.Estudiante.Persona?.name} ${itemFound!
+        .Estudiante.Persona?.surname}`,
       documentName: docFound?.filename!,
     };
     setSelectedDocumentData(documentFound);
     setDoubleModalOpen(true);
   };
-
-  const [isLoadingManageDocument, setIsLoadingManageDocument] = useState(false);
 
   return (
     <>
@@ -340,9 +325,7 @@ export default function Students() {
                     <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
                       <div>{item.Estudiante.code}</div>
                       <div>
-                        {item.Estudiante.Persona.name +
-                          " " +
-                          item.Estudiante.Persona.surname}
+                        {`${item.Estudiante.Persona.name} ${item.Estudiante.Persona.surname}`}
                       </div>
                       <div>{item.Estudiante.School.name}</div>
                       <div>
@@ -354,10 +337,8 @@ export default function Students() {
                         />
                       </div>
                       <div className="flex items-center gap-2">
-                        <UserIcon className="h-4 w-4" />{" "}
-                        {item.Supervisor.Docente.Persona.name +
-                          " " +
-                          item.Supervisor.Docente.Persona.surname}
+                        <UserIcon className="h-4 w-4" />
+                        {`${item.Supervisor.Docente.Persona.name} ${item.Supervisor.Docente.Persona.surname}`}
                       </div>
                       <div className="flex items-center gap-2">
                         <ClockIcon className="h-4 w-4" /> 4M
@@ -437,18 +418,18 @@ export default function Students() {
             <>
               <div className="flex items-center justify-between">
                 <div className="text-[0.625rem] text-[#757575]">
-                  {" "}
                   {`${startIndex + 1} - ${Math.min(
                     endIndex,
                     filteredData.length,
-                  )} de ${filteredData.length}`}{" "}
+                  )} de ${filteredData.length}`}
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     disabled={currentPage === 1}
-                    className={`h-[1.5rem] w-[1.5rem] p-0.5
-            ${currentPage === 1 ? "text-[#bababa]" : "text-[#FF9853]"}`}
+                    className={`h-[1.5rem] w-[1.5rem] p-0.5 ${
+                      currentPage === 1 ? "text-[#bababa]" : "text-[#FF9853]"
+                    }`}
                     onClick={() => goToPreviousPage()}
                   >
                     <ChevronLeftIcon />
@@ -457,12 +438,11 @@ export default function Students() {
                     {Array.from({ length: totalPages }, (_, index) => (
                       <button
                         key={index}
-                        className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] 
-                ${
-                  currentPage == index + 1
-                    ? "bg-[#FF9853] text-white"
-                    : "text-[#757575]"
-                }`}
+                        className={`h-[1.5rem] w-[1.5rem] rounded-[0.3125rem] text-[0.625rem] ${
+                          currentPage == index + 1
+                            ? "bg-[#FF9853] text-white"
+                            : "text-[#757575]"
+                        }`}
                         onClick={() => handlePageChange(index + 1)}
                       >
                         {index + 1}
@@ -472,11 +452,11 @@ export default function Students() {
                   <button
                     onClick={() => goToNextPage()}
                     disabled={currentPage === totalPages}
-                    className={`h-[1.5rem] w-[1.5rem] p-0.5
-              
-              ${
-                currentPage === totalPages ? "text-[#bababa]" : "text-[#FF9853]"
-              }`}
+                    className={`h-[1.5rem] w-[1.5rem] p-0.5 ${
+                      currentPage === totalPages
+                        ? "text-[#bababa]"
+                        : "text-[#FF9853]"
+                    }`}
                   >
                     <ChevronRightIcon />
                   </button>
@@ -487,24 +467,5 @@ export default function Students() {
         </div>
       </div>
     </>
-  );
-}
-
-function PDFIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      viewBox="0 0 14 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        id="Vector"
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M14 4.5V14C14 14.5304 13.7893 15.0391 13.4142 15.4142C13.0391 15.7893 12.5304 16 12 16H11V15H12C12.2652 15 12.5196 14.8946 12.7071 14.7071C12.8946 14.5196 13 14.2652 13 14V4.5H11C10.6022 4.5 10.2206 4.34196 9.93934 4.06066C9.65804 3.77936 9.5 3.39782 9.5 3V1H4C3.73478 1 3.48043 1.10536 3.29289 1.29289C3.10536 1.48043 3 1.73478 3 2V11H2V2C2 1.46957 2.21071 0.960859 2.58579 0.585786C2.96086 0.210714 3.46957 0 4 0L9.5 0L14 4.5ZM1.6 11.85H0V15.849H0.791V14.507H1.594C1.881 14.507 2.125 14.45 2.326 14.334C2.529 14.217 2.684 14.059 2.789 13.86C2.89799 13.6512 2.95331 13.4185 2.95 13.183C2.95 12.933 2.897 12.707 2.792 12.506C2.68756 12.3062 2.52789 12.1406 2.332 12.029C2.132 11.909 1.889 11.85 1.6 11.85ZM2.145 13.183C2.1486 13.3148 2.1194 13.4453 2.06 13.563C2.00671 13.6654 1.92377 13.7494 1.822 13.804C1.70559 13.8616 1.57683 13.8897 1.447 13.886H0.788V12.48H1.448C1.666 12.48 1.837 12.54 1.96 12.661C2.083 12.783 2.145 12.957 2.145 13.183ZM3.362 11.85V15.849H4.822C5.223 15.849 5.556 15.769 5.82 15.612C6.08716 15.4522 6.29577 15.2106 6.415 14.923C6.545 14.623 6.611 14.261 6.611 13.839C6.611 13.419 6.546 13.061 6.415 12.764C6.29718 12.4797 6.09056 12.2412 5.826 12.084C5.562 11.928 5.227 11.85 4.821 11.85H3.362ZM4.153 12.495H4.716C4.964 12.495 5.166 12.545 5.325 12.647C5.49004 12.7549 5.61456 12.9146 5.679 13.101C5.758 13.302 5.797 13.553 5.797 13.854C5.8001 14.0534 5.77724 14.2524 5.729 14.446C5.69337 14.5986 5.62665 14.7423 5.533 14.868C5.44599 14.9801 5.33072 15.0671 5.199 15.12C5.04466 15.1777 4.88075 15.2056 4.716 15.202H4.153V12.495ZM7.896 14.258V15.849H7.106V11.85H9.654V12.503H7.896V13.62H9.502V14.258H7.896Z"
-        fill="currentColor"
-      />
-    </svg>
   );
 }

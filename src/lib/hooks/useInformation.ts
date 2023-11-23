@@ -15,7 +15,7 @@ export const useInformation = () => {
   }
 
   const {
-    user: { roles, ...user } ,
+    user: { role, ...user },
   } = data as any;
-  return { user, roles };
+  return { user, role };
 };
