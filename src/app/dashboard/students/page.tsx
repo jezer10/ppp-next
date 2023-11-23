@@ -6,11 +6,18 @@ import {
   ChevronLeftIcon,
   ChevronDownIcon,
   IdentificationIcon,
+<<<<<<< HEAD
+  UserGroupIcon,
+  TrashIcon,
+=======
   DocumentIcon,
   UserGroupIcon,
   EyeIcon,
+>>>>>>> 78f1da7ad979950bdd48b7a41d6a104f8003d78d
   UserIcon,
   ClockIcon,
+  DocumentIcon,
+  EyeIcon
 } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useState } from "react";

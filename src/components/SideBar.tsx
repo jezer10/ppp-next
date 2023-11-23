@@ -11,13 +11,13 @@ import Image from "next/image";
 import adv_log from "@/../public/image_logo.png";
 import sis_log_min from "@/../public/logo_sistemas_mini.png";
 import sis_log from "@/../public/logo_sistemas.png";
-import profile_pic from "@/../public/dreyna.jpg";
 
 import {
   ChevronLeftIcon,
   Bars3Icon,
   ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/20/solid";
+import profile_pic from "../../public/reyna_pic.jpeg";
 import DynamicHeroIcon from "./DynamicHeroIcon";
 
 export default function Sidebar({
@@ -37,6 +37,7 @@ export default function Sidebar({
   const pathname = usePathname();
 
   const [menuItems, setMenuItems] = useState([]);
+
 
   useEffect(() => {
     async function getAccess() {
