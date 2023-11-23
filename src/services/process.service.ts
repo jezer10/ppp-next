@@ -17,11 +17,8 @@ export const ProcessService = {
         throw new Error("Error al obtener la lista de procesos");
       }
 
-      const students = await response.json();
-      console.log(students);
-      return students;
+      return response.json();
     } catch (error) {
-      console.error("Error en ProcessService.getAllProcesses:", error);
       throw error;
     }
   },
