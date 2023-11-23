@@ -1,5 +1,4 @@
 import { LoginAuthService } from "@/services";
-import { log } from "console";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -9,41 +8,57 @@ const handler = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        USR_USERNAME: {
+        username: {
           label: "Username",
           type: "text",
-          placeholder: "Username",
+          placeholder: "jsmith",
         },
-        USR_PASSWORD: { label: "Password", type: "password" },
+        password: {
+          label: "Password",
+          type: "password",
+        },
       },
-      async authorize(credentials, req) {        
-
-        const login = await LoginAuthService({
-          username: req.body!.username,
-          password: req.body!.password,
+      async authorize(credentials, req) {
+        const { username, password } = credentials!;
+        const response = await LoginAuthService({
+          username,
+          password,
         });
-
-        if (login.status !== 200) {
-            throw new Error(`${login.message}`)
+        if (response.status !== 200) {
+          throw new Error(`${response.message}`);
         }
-        return login;
+        return response.data;
       },
     }),
   ],
 
   callbacks: {
-    jwt({ token, user, account }) {
-      if (user) token.user = user;
+    jwt({ token, user }) {
+      if (user) {
+        return {
+          user,
+        };
+      }
       return token;
     },
-    session({ session, token }) {
-      if (token) session.user = token.user as any;
+    session({ session, token, user }) {
+      if (token) {
+        return {
+          ...session,
+          user: token.user as any,
+        };
+      }
       return session;
     },
   },
   pages: {
     signIn: "/",
   },
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
 });
 
 export { handler as GET, handler as POST };

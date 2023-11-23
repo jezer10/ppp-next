@@ -1,94 +1,140 @@
+import { rejectStudentDocument, validateStudentDocument } from "@/services";
 import { IManageDocument } from "../interfaces/modal";
+import { ChangeEvent, useState } from "react";
+import { toast } from "react-toastify";
+import { Resend } from "resend";
+import ValidateDocumentEmail from "@/components/templates/ValidateDocumentEmail";
 
+const RESEND_KEY = "re_RD2L1uQK_MP9tuokbb2QumngwzYqLmQ2z";
+const MAIN_EMAIL = "onboarding@.dev";
+
+const resend = new Resend(RESEND_KEY);
+const headers = {
+  Accept: "application/json",
+  "Content-Type": "application/json",
+};
 function ManageDocument(props: IManageDocument) {
+  const [inputValue, setInputValue] = useState("");
 
-    const validateDocument = () => {
+  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.target.value);
+  };
+  const validateDocument = async () => {
+    try {
+      await validateStudentDocument(props.document?.step_id, inputValue);
 
+      const response = await fetch("/api/emails/validate", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          observaciones: inputValue,
+          fullName: props.document?.fullName,
+        }),
+      });
+      console.log(await response.json());
+
+      toast.success("Documento validado correctamente");
+      props.onClose(true);
+    } catch (error) {
+      return toast.error("Error al validar el documento");
     }
+  };
 
-    const rejectDocument = () => {
-        
+  const rejectDocument = async () => {
+    if (!inputValue) {
+      return toast.error("Debe ingresar una observación");
     }
+    await rejectStudentDocument(props.document?.step_id, inputValue);
+    const response = await fetch("/api/emails/reject", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        observaciones: inputValue,
+        fullName: props.document?.fullName,
+      }),
+    });
+    console.log(await response.json());
+    toast.success("Documento rechazado correctamente");
+    props.onClose(true);
+  };
 
-
-    return (
-        <>
-            <div className="w-[70%] bg-[#404040] rounded-l-lg flex justify-center">
-                <DocumentPreview fileRoute={"https://firebasestorage.googleapis.com/v0/b/ppp-8eefe.appspot.com/o/uploads%2F1697527519046-tarea.pdf?alt=media&token=8ac69077-5964-404a-ae31-38ef735d156b"} />
+  return (
+    <>
+      <div className="flex h-full w-full justify-center rounded-l-lg bg-[#404040] md:h-auto md:w-[70%]">
+        <DocumentPreview fileRoute={props.document?.path} />
+      </div>
+      <div className="relative flex w-full justify-center rounded-l-lg md:w-[30%]">
+        <div className="flex h-full w-full flex-col justify-between gap-3 px-8 py-8">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col ">
+              <span className="font-thin text-[#7e7e7e]">Alumno</span>
+              <span className="text-xl font-bold text-[#757575]">
+                {props.document?.fullName ?? "-"}
+              </span>
             </div>
-            <div className="w-[30%] relative rounded-l-lg flex justify-center">
-
-                {
-                    props.isLoading && (
-                        <div className="bg-[#313131]/80 h-full w-full flex justify-center items-center absolute z-[99]">
-                            <div role="status">
-                                <svg aria-hidden="true" className="w-10 h-10 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-[#FF9853]" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
-                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
-                                </svg>
-                                <span className="sr-only">Loading...</span>
-                            </div>
-                        </div>
-
-                    )
-                }
-
-                <div className="h-full w-full flex flex-col justify-between gap-3 px-8 py-8">
-                    <div className="flex flex-col gap-5">
-                        <div className="flex flex-col w-full">
-                            <span className="text-sm font-semibold text-[#7e7e7e]"> Alumno</span>
-                            <span className="text-sm text-[#bababa]">
-                                {props.studentName != null ? props.studentName : '-'}
-                            </span>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-[#7e7e7e]"> Nombre del archivo</span>
-                            <span className="text-sm text-[#bababa]">
-                                {props.documentName != null ? props.documentName : '-'}
-                            </span>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-[#7e7e7e]"> Observaciones:</span>
-                            <textarea
-                                // type="text"
-                                // value={searchTerm}
-                                // onChange={(e) => handleSearchTermChange(e.target.value)}
-                                className="border border-[#757575]/30 rounded-lg resize-none px-4 py-2 placeholder:text-sm placeholder:font-light placeholder:text-[#C4C4C4] focus:outline-none"
-                                placeholder="Anote sus observaciones..."
-                                rows={5}
-                            ></textarea>
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-3">
-                        <button className="h-full rounded-lg bg-[#FF9853] p-3 text-white ">
-                            Validar
-                        </button>
-                        <button className="h-full rounded-lg border border-[#FE7272] p-3 text-[#FE7272] ">
-                            Rechazar
-                        </button>
-                        <span onClick={props.onClose} className="cursor-pointer p-3 text-center"> Volver </span>
-                    </div>
-                </div>
+            <div className="flex flex-col ">
+              <span className="font-thin text-[#7e7e7e]">
+                Nombre del archivo
+              </span>
+              <span className="text-xl font-bold text-[#757575]">
+                {props.document?.filename ?? "-"}
+              </span>
             </div>
-        </>
-
-
-
-    )
-
+            <div className="flex flex-col gap-2">
+              <span className="font-thin text-[#7e7e7e]">Observaciones:</span>
+              {props.document?.state == 0 ? (
+                <>
+                  <textarea
+                    className="resize-none rounded-lg border border-[#757575]/30 px-4 py-2 placeholder:text-sm placeholder:font-light placeholder:text-[#C4C4C4] focus:outline-none"
+                    placeholder="Describa sus Observaciones"
+                    rows={5}
+                    value={inputValue}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </>
+              ) : (
+                <span className="text-xl font-bold text-[#757575]">
+                  {props.document?.observaciones ?? "-"}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-4">
+            {props.document?.state == 0 && (
+              <>
+                <button
+                  onClick={validateDocument}
+                  className="w-full rounded-lg bg-[#FF9853] py-4 font-bold text-white "
+                >
+                  Validar
+                </button>
+                <button
+                  onClick={rejectDocument}
+                  className="w-full rounded-lg border border-[#FE7272] py-4 font-bold  text-[#FE7272] "
+                >
+                  Rechazar
+                </button>
+              </>
+            )}
+            <button
+              onClick={() => props.onClose()}
+              className="rounded-lg px-4 py-2 text-center text-sm font-bold hover:bg-gray-200"
+            >
+              Volver
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
 
 function DocumentPreview({ fileRoute }: { fileRoute: string }) {
-    const encodedURL = encodeURIComponent(fileRoute);
-    const googleDocsViewerLink = `https://drive.google.com/viewerng/viewer?embedded=true&url=${encodedURL}`;
-
-    return (
-        <iframe
-            src={googleDocsViewerLink}
-            width="80%"
-            height="100%"
-        ></iframe>
-    );
+  const encodedURL = encodeURIComponent(fileRoute);
+  const googleDocsViewerLink = `https://drive.google.com/viewerng/viewer?embedded=true&url=${encodedURL}`;
+  return (
+    <iframe src={googleDocsViewerLink} width="100%" height="100%"></iframe>
+  );
 }
 
 export default ManageDocument;

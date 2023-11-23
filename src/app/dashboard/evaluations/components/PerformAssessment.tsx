@@ -1,5 +1,5 @@
 import { ConfirmAlert, InfoAlert } from "@/components/Alert";
-import { config } from "@/config";
+import config  from "@/config";
 import { ArrowUturnLeftIcon, FolderIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
 

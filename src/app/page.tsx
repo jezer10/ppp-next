@@ -1,36 +1,37 @@
 "use client";
-import Image from "next/image";
-import log_sis from "../../public/logo_sistemas.png";
-import log_adv from "../../public/logo_adventista.png";
-import log_grp from "../../public/group.svg";
 import {
   UserIcon,
   CheckIcon,
   XMarkIcon,
-  LockClosedIcon,
   EyeIcon,
   EyeSlashIcon,
 } from "@heroicons/react/24/solid";
-
-import { ToastContainer, toast } from "react-toastify";
-
-import "react-toastify/dist/ReactToastify.css";
-
 import { useState } from "react";
-import { LoginAuthService } from "@/services";
-import { getSession, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { toast } from "react-toastify";
+
+import Image from "next/image";
+import log_sis from "@/../public/logo_sistemas.png";
+import log_adv from "@/../public/logo_adventista.png";
+import log_grp from "@/../public/group.svg";
 
 const Home = () => {
-  const [isValid, setValid] = useState(false);
   const [visible, setVisible] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
   const [form, setForm] = useState({
-    username: "",
-    password: "",
+    username: "flora",
+    password: "12345678",
   });
 
-  function changeForm(e: any) {
+  function isValid(): boolean {
+    const { username } = form;
+    if (username.length < 5) {
+      return false;
+    }
+    return true;
+  }
+  function changeForm(e: React.ChangeEvent<HTMLInputElement>) {
     let name = e.target.name;
     let value = e.target.value;
 
@@ -40,69 +41,24 @@ const Home = () => {
     });
   }
 
-  async function loginAction() {
-    const login = {
-      username: form.username,
-      password: form.password,
-    };
+  async function loginAction(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const { username, password } = form;
 
-    // const login_service = await LoginAuthService(login);
-
-    const login_obj = await signIn("credentials", {
-      username: login.username,
-      password: login.password,
-      redirect : false
+    const signInResponse = await signIn("credentials", {
+      username,
+      password,
+      redirect: false,
     });
-
-    
-    if (login_obj!.error) {
-      return toast.error(login_obj!.error);
+    if (signInResponse?.error) {
+      return toast.error(signInResponse.error);
     }
-
-    const session = await getSession()
-    console.log(session);
-    
-    const {user} = session as any
-    toast.success((user.message).toUpperCase())
-    router.push("/dashboard")
-    // if (login_service.status !== 200) {
-    //   setValid(false);
-    //   throw login_service.message;
-    // }
-    // setValid(true);
-    // return login_service.message;
+    toast.success("Inicio de Sesión Exitoso");
+    router.push("/dashboard");
   }
-
-  // function login() {
-  //   toast.promise(loginAction, {
-  //     pending: "Espere...",
-  //     success: {
-  //       render({ data }) {
-  //         return `${data.toUpperCase()}`;
-  //       },
-  //     },
-  //     error: {
-  //       render({ data }) {
-  //         return `${data}`;
-  //       },
-  //     },
-  //   });
-  // }
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <div className=" h-screen overflow-hidden   px-16">
         <div className="absolute inset-0 -z-20 h-full bg-gradient-to-r from-[#0F3971] to-white"></div>
         <Image
@@ -117,7 +73,7 @@ const Home = () => {
               <Image
                 src={log_sis}
                 alt="logo sistemas"
-                className="h-auto w-auto"
+                className="h-12 w-auto object-contain"
               />
             </div>
             <div className="flex flex-col gap-32">
@@ -162,55 +118,58 @@ const Home = () => {
                 ingresa tus credenciales para continuar
               </div>
             </div>
-            <div className="flex flex-col gap-4">
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  className="w-full rounded-lg px-4 py-3 pr-10 placeholder:text-sm  placeholder:text-[#83878D] focus:outline-none"
-                  placeholder="Usuario"
-                  name="username"
-                  value={form.username}
-                  onChange={changeForm}
-                />
-                <div className="absolute right-2 h-6 w-6 text-[#83878D]">
-                  <div className="relative">
-                    <UserIcon />
+            <form onSubmit={loginAction}>
+              <div className="flex flex-col gap-4">
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    className="w-full rounded-lg border px-4 py-3 pr-10 placeholder:text-sm placeholder:text-[#83878D]  focus:border-cyan-100 focus:outline-none"
+                    placeholder="Usuario"
+                    name="username"
+                    value={form.username}
+                    onChange={changeForm}
+                  />
+                  <div className="absolute right-2 h-6 w-6 text-[#83878D]">
+                    <div className="relative">
+                      <UserIcon />
 
-                    <div
-                      className={`absolute bottom-0 right-0 h-3 w-3 rounded-full bg-white ${
-                        isValid ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {isValid ? <CheckIcon /> : <XMarkIcon />}
+                      <div
+                        className={`absolute bottom-0 right-0 h-3 w-3 rounded-full bg-white ${
+                          isValid() ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {isValid() ? <CheckIcon /> : <XMarkIcon />}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="relative flex items-center">
-                <input
-                  type={visible ? "text" : "password"}
-                  className="w-full rounded-lg px-4 py-3 pr-10 placeholder:text-sm  placeholder:text-[#83878D] focus:outline-none"
-                  placeholder="Contraseña"
-                  name="password"
-                  value={form.password}
-                  onChange={changeForm}
-                />
-                <div className="absolute right-2 h-6 w-6 text-[#83878D]">
-                  <div
-                    className="relative cursor-pointer hover:text-[#0F3971]"
-                    onClick={() => setVisible(!visible)}
-                  >
-                    {visible ? <EyeSlashIcon /> : <EyeIcon />}
+                <div className="relative flex items-center">
+                  <input
+                    type={visible ? "text" : "password"}
+                    className="w-full rounded-lg border px-4 py-3 pr-10 placeholder:text-sm placeholder:text-[#83878D]  focus:border-cyan-100 focus:outline-none"
+                    placeholder="Contraseña"
+                    name="password"
+                    value={form.password}
+                    onChange={changeForm}
+                  />
+                  <div className="absolute right-2 h-6 w-6 text-[#83878D]">
+                    <div
+                      className="relative cursor-pointer hover:text-[#0F3971]"
+                      onClick={() => setVisible(!visible)}
+                    >
+                      {visible ? <EyeSlashIcon /> : <EyeIcon />}
+                    </div>
                   </div>
                 </div>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-[#0F3971] py-3 text-white"
+                >
+                  Ingresar
+                </button>
               </div>
-              <button
-                className="rounded-lg bg-[#0F3971] py-3 text-white"
-                onClick={loginAction}
-              >
-                Ingresar
-              </button>
-            </div>
+            </form>
+
             <div className="px-4 text-center text-sm font-light text-[#0F3971]">
               <p>
                 Si tiene problemas con sus credenciales pongase en contacto con{" "}

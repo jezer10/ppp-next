@@ -1,138 +1,136 @@
-
 "use client";
-import { useEffect, useState } from "react";
-import { useRef } from "react";
-// import SubMenu from "./SubMenu";
-import { motion } from "framer-motion";
-import { useMediaQuery } from "react-responsive";
-import { useRouter, usePathname } from "next/navigation"; // Importa useRouter de Next.js
+import { useRef, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useInformation } from "@/lib/hooks/useInformation";
+import { motion } from "framer-motion";
 import { AccessAuthService } from "@/services";
+
 import Image from "next/image";
-import adv_log from "../../public/image_logo.png";
-import sis_log_min from "../../public/logo_sistemas_mini.png";
-import sis_log from "../../public/logo_sistemas.png";
+import adv_log from "@/../public/image_logo.png";
+import sis_log_min from "@/../public/logo_sistemas_mini.png";
+import sis_log from "@/../public/logo_sistemas.png";
+
 import {
-  ClockIcon, HomeIcon, ChevronLeftIcon, Bars3Icon, ArrowLeftOnRectangleIcon,
+  ChevronLeftIcon,
+  Bars3Icon,
+  ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/20/solid";
 import profile_pic from "../../public/reyna_pic.jpeg";
-import { signOut } from "next-auth/react";
 import DynamicHeroIcon from "./DynamicHeroIcon";
 
-const Sidebar = () => {
-  // const router = useRouter(); // Usa el hook useRouter para obtener la ruta actual
-  const isTabletMid = useMediaQuery({ query: "(max-width: 768px)" });
-  const [open, setOpen] = useState(isTabletMid ? false : true);
+export default function Sidebar({
+  isVisible,
+  isTabletOrMobile,
+  closeSidebar,
+  openSidebar,
+}: {
+  isVisible: boolean;
+  isTabletOrMobile: boolean;
+  closeSidebar: () => void;
+  openSidebar: () => void;
+}) {
   const sidebarRef = useRef(null);
 
-  const { user_data, roles } = useInformation();
+  const { user, role, loading } = useInformation();
   const pathname = usePathname();
 
   const [menuItems, setMenuItems] = useState([]);
 
-  async function getAccess() {
-    console.log(roles)
-    const accesos = await AccessAuthService(roles[0].role_id)
-    console.log(accesos)
-    setMenuItems(accesos.info.filter((e : any) => e.father_id == null))
-  }
 
   useEffect(() => {
-    getAccess()
-
-  }, [roles])
-
-  useEffect(() => {
-    if (isTabletMid) {
-      setOpen(false);
-    } else {
-      setOpen(true);
+    async function getAccess() {
+      if (role?.role_id) {
+        const { access } = await AccessAuthService(role.role_id);
+        setMenuItems(access);
+      }
     }
-  }, [isTabletMid]);
+    getAccess();
+  }, [role]);
 
-  useEffect(() => {
-    isTabletMid && setOpen(false);
-  }, [pathname]); // Usar pathname para detectar cambios en la ruta
-
-  const Nav_animation = isTabletMid
+  const Nav_animation = isTabletOrMobile
     ? {
-      open: {
-        x: 0,
-        width: "20rem",
-        transition: {
-          damping: 40,
+        open: {
+          x: 0,
+          width: "20rem",
+          transition: {
+            damping: 40,
+          },
         },
-      },
-      closed: {
-        x: -250,
-        width: 0,
-        transition: {
-          damping: 40,
-          delay: 0.15,
+        closed: {
+          x: -250,
+          width: 0,
+          transition: {
+            damping: 40,
+            delay: 0.15,
+          },
         },
-      },
-    }
+      }
     : {
-      open: {
-        width: "20rem",
-        transition: {
-          damping: 40,
+        open: {
+          width: "20rem",
+          transition: {
+            damping: 40,
+          },
         },
-      },
-      closed: {
-        width: "4rem",
-        transition: {
-          damping: 40,
+        closed: {
+          width: "4rem",
+          transition: {
+            damping: 40,
+          },
         },
-      },
-    };
+      };
 
   return (
-    <div>
+    loading || (
+      <div>
+        <div
+          onClick={closeSidebar}
+          className={`fixed inset-0 z-[900] max-h-screen bg-black/50 md:hidden ${
+            isVisible ? "block" : "hidden"
+          }`}
+        ></div>
 
-      {/* Cerrar sidebar en vista móvil clickando afuera*/}
-
-      <div
-        onClick={() => setOpen(false)}
-        className={`md:hidden fixed inset-0 max-h-screen z-[900] bg-black/50 ${open ? "block" : "hidden"}`}
-      ></div>
-
-      <motion.div
-        ref={sidebarRef}
-        variants={Nav_animation}
-        initial={{ x: isTabletMid ? -250 : 0 }}
-        animate={open ? "open" : "closed"}
-        className="bg-white text-gray shadow-xl z-[901] max-w-80 w-80 overflow-y-auto md:relative fixed 
-        
-        flex h-full  flex-none flex-col gap-8"
-      >
-
-        <div className="relative">
-          <div
-            className={`-translate-x-8 translate-y-2 bg-[#E4752B] ${(open || (!open && isTabletMid)) && "flagg"}  ${(!open && !isTabletMid) && "flagg_min"}`}
-
-          ></div>
-          <div className="absolute inset-0">
+        <motion.div
+          ref={sidebarRef}
+          variants={Nav_animation}
+          initial={{ x: isTabletOrMobile ? -250 : 0 }}
+          animate={isVisible ? "open" : "closed"}
+          className="text-gray max-w-80 fixed z-[901] flex h-full w-80 flex-none flex-col gap-8 overflow-y-auto  bg-white shadow-xl md:relative"
+        >
+          <div className="relative">
             <div
-              className={` relative bg-[#0F3971]  ${(open || (!open && isTabletMid)) && "flagg"}  ${(!open && !isTabletMid) && "flagg_min"}`}>
-              {
-
-                (open || (!open && isTabletMid)) && (<>
-                  <div className="absolute left-6 top-6 w-1/2">
-                    <Image
-                      src={sis_log}
-                      alt="logo"
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                  <div className="absolute top-0  flex h-full w-full justify-end">
-                    <Image src={adv_log} alt="hola" />
-                  </div>
-                </>)
-              }
-              {
-                (!open && !isTabletMid) && (
+              className={`-translate-x-8 translate-y-2 bg-[#E4752B] ${
+                (isVisible || (!isVisible && isTabletOrMobile)) && "flagg"
+              }  ${!open && !isTabletOrMobile && "flagg_min"}`}
+            ></div>
+            <div className="absolute inset-0">
+              <div
+                className={` relative bg-[#0F3971]  ${
+                  (isVisible || (!isVisible && isTabletOrMobile)) && "flagg"
+                }  ${!isVisible && !isTabletOrMobile && "flagg_min"}`}
+              >
+                {(isVisible || (!isVisible && isTabletOrMobile)) && (
+                  <>
+                    <div className="absolute left-6 top-6 w-1/2">
+                      <Image
+                        src={sis_log}
+                        alt="logo"
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="absolute top-0  flex h-full w-full justify-end">
+                      <Image
+                        src={adv_log}
+                        className="h-full w-auto"
+                        alt="Logo Adventista"
+                        priority={true}
+                      />
+                    </div>
+                  </>
+                )}
+                {!isVisible && !isTabletOrMobile && (
                   <div className="absolute left-[0.8rem] top-[1.3rem] w-1/2">
                     <Image
                       src={sis_log_min}
@@ -140,187 +138,79 @@ const Sidebar = () => {
                       className="h-full w-full object-contain"
                     />
                   </div>
-                )
-              }
+                )}
+              </div>
             </div>
-          </div>
-        </div>
-
-
-        <div
-          className={`flex flex-col h-full justify-between gap-4  py-4 ${(open || (!open && isTabletMid)) && "px-8"}  ${(!open && !isTabletMid) && "px-0 items-center"}`}
-        >
-
-
-
-          <nav>
-            <ul className="flex flex-col gap-2">
-              {menuItems.length !== 0 && menuItems.map((e: any, index) => {
-                const path = `/dashboard${e.url || ""}`;
-                const isActive = e.url === null ? (pathname === path) : pathname.startsWith(path);
-                return (
-                  <li key={index}>
-                    <Link
-                      href={path}
-                      className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${isActive
-                        ? "bg-[#FF9853] font-bold text-white"
-                        : "text-[#C4C4C4]"
-                        }`}
-                    >
-                      <DynamicHeroIcon icon={e.icon} />
-                      {
-                        (open || (!open && isTabletMid)) && (
-                          <div>{e.name}</div>
-                        )
-                      }
-
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-          {/* Icono para abrir y cerrar el sidebar en desktop */}
-
-
-          <div className="w-full flex justify-center">
-            <motion.div
-              onClick={() => {
-                setOpen(!open);
-              }}
-              animate={
-                open
-                  ? {
-                    x: 0,
-                    y: 0,
-                    rotate: 0,
-                  }
-                  : {
-                    x: 0,
-                    y: 0,
-                    rotate: 180,
-                  }
-              }
-              transition={{ duration: 0 }}
-              className="w-8 h-8 md:block  z-50 hidden p-1 bottom-3 cursor-pointer bg-[#FF9853] text-white rounded-full"
-            >
-              <ChevronLeftIcon className="w-full h-full" />
-            </motion.div>
-
           </div>
 
           <div
-            className={`flex items-center justify-between text-[#C4C4C4] ${(open || (!open && isTabletMid)) && "flex-row"}  ${(!open && !isTabletMid) && "flex-col-reverse gap-4"}`}
+            className={`flex h-full flex-col justify-between gap-4  py-4 ${
+              (isVisible || (!isVisible && isTabletOrMobile)) && "px-8"
+            }  ${!isVisible && !isTabletOrMobile && "items-center px-0"}`}
           >
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 overflow-hidden rounded-full ">
-                <Image src={profile_pic} alt="hola" />
-              </div>
-              {
-                (open || (!open && isTabletMid)) && (
+            <nav>
+              <ul className="flex flex-col gap-2">
+                {menuItems.length !== 0 &&
+                  menuItems.map((item: any, index) => {
+                    const path = `/dashboard${item.url || ""}`;
+                    const isActive =
+                      item.url === null
+                        ? pathname === path
+                        : pathname.startsWith(path);
+                    return (
+                      <li key={index}>
+                        <Link
+                          href={path}
+                          className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${
+                            isActive
+                              ? "bg-[#FF9853] font-bold text-white"
+                              : "text-[#C4C4C4]"
+                          }`}
+                        >
+                          <DynamicHeroIcon icon={item.icon} />
+                          {(isVisible || (!isVisible && isTabletOrMobile)) && (
+                            <div>{item.name}</div>
+                          )}
+                        </Link>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </nav>
+
+            <div
+              className={`flex items-center justify-between text-[#C4C4C4] ${
+                (isVisible || (!isVisible && isTabletOrMobile)) && "flex-row"
+              }  ${
+                !isVisible && !isTabletOrMobile && "flex-col-reverse gap-4"
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 overflow-hidden rounded-full ">
+                  <Image src={profile_pic} alt="hola" />
+                </div>
+                {(isVisible || (!isVisible && isTabletOrMobile)) && (
                   <div className="text-xs">
                     <div className="font-bold">
-                      {user_data[0].name + " " + user_data[0].surname}
+                      {`${user?.name} ${user?.surname}`}
                     </div>
 
-                    <div className="font-thin">{roles[0].name}</div>
+                    <div className="font-thin">{role?.name}</div>
                   </div>
-                )
-              }
+                )}
+              </div>
+              <div
+                className="h-8 w-8 cursor-pointer rounded-full p-1 hover:bg-[#FF9853] hover:text-white"
+                onClick={async () => {
+                  await signOut();
+                }}
+              >
+                <ArrowLeftOnRectangleIcon />
+              </div>
             </div>
-            <div
-              className="h-8 w-8 cursor-pointer rounded-full p-1 hover:bg-[#FF9853] hover:text-white"
-              onClick={async () => {
-                await signOut();
-              }}
-            >
-              <ArrowLeftOnRectangleIcon />
-            </div>
-
           </div>
-
-        </div>
-
-
-
-
-      </motion.div>
-
-
-      {/* Icono en mobile para abrir el sidebar */}
-      <div className="m-3 md:hidden" onClick={() => setOpen(true)}>
-        <Bars3Icon className="w-4 h-4" />
+        </motion.div>
       </div>
-
-    </div>
+    )
   );
-};
-
-export default Sidebar;
-
-
-// <aside className="flex h-full bg-white w-80 flex-none flex-col z-[51] ">
-//   <div className="relative">
-//     <div className="flagg -translate-x-8 translate-y-2 bg-[#E4752B] "></div>
-//     <div className="absolute inset-0">
-//       <div className="flagg relative  bg-[#0F3971] ">
-//         <div className="absolute left-6 top-6 w-1/2">
-//           <Image
-//             src={sis_log}
-//             alt="logo"
-//             className="h-full w-full object-contain"
-//           />
-//         </div>
-//         <div className="absolute top-0  flex h-full w-full justify-end">
-//           <Image src={adv_log} alt="hola" />
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-//   <div className="flex h-full flex-col justify-between gap-4 px-8 py-4">
-//     <nav>
-//       <ul className=" flex flex-col gap-2">
-//         {menuItems.length !== 0 && menuItems.map((e : any, index) => {
-//           const path = `/dashboard${e.url || ""}`;
-//           const isActive = pathname === path;
-//           return (
-//             <li key={index}>
-//               <Link
-//                 href={path}
-//                 className={`flex gap-2 rounded-lg px-4 py-3 text-sm transition-all hover:bg-[#FF9853] hover:font-bold hover:text-white ${
-//                   isActive
-//                     ? "bg-[#FF9853] font-bold text-white"
-//                     : "text-[#C4C4C4]"
-//                 }`}
-//               >
-//                 <HomeIcon className="h-4 w-4" /> <div>{e.name}</div>
-//               </Link>
-//             </li>
-//           );
-//         })}
-//       </ul>
-//     </nav>
-//     <div className="flex items-center justify-between  text-[#C4C4C4] ">
-//       <div className="flex items-center gap-4">
-//         <div className="h-12 w-12 overflow-hidden rounded-full ">
-//           <Image src={profile_pic} alt="hola" />
-//         </div>
-//         <div className="text-xs">
-//           <div className="font-bold">
-//             {user_data[0].name + " " + user_data[0].surname}
-//           </div>
-
-//           <div className="font-thin">{roles[0].name}</div>
-//         </div>
-//       </div>
-//       <div
-//         className="h-8 w-8 cursor-pointer rounded-full p-1 hover:bg-[#FF9853] hover:text-white"
-//         onClick={async () => {
-//           await signOut();
-//         }}
-//       >
-//         <ArrowLeftOnRectangleIcon />
-//       </div>
-//     </div>
-//   </div>
-// </aside>
+}

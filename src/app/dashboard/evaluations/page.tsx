@@ -9,13 +9,10 @@ import {
   ChevronLeftIcon,
   ChevronDownIcon,
   IdentificationIcon,
-  UserGroupIcon,
   TrashIcon,
   UserIcon,
   ClockIcon,
-  PlusCircleIcon,
   DocumentIcon,
-  EyeIcon,
   ClipboardDocumentIcon,
   Bars3Icon,
   PencilSquareIcon,
@@ -33,7 +30,7 @@ import { IAssesment } from './interfaces/process';
 import ManageAssesment from './components/ManageAssesment';
 import { ConfirmAlert, SuccessAlert } from '@/components/Alert';
 import PerformAssessment from './components/PerformAssessment';
-import { config } from "@/config";
+import config from "@/config";
 
 const initModalValues: IModalProps = {
   fullName: null,
@@ -71,7 +68,7 @@ function EvaluationComponent() {
   const [processList, setProcessList] = useState<IProcess[]>([]);
   const [selectedStudentData, setSelectedStudentData] = useState<IModalProps>(initModalValues);
   const [modalOpen, setModalOpen] = useState(false);
-  const { user_data } = useInformation();
+  const { user } = useInformation();
   const URL_APIS = config.BACK_URL;
 
   const [modalAssesment, setModalAssesment] = useState(false);
@@ -286,7 +283,7 @@ function EvaluationComponent() {
   /* Services */
 
   const fetchProcesses = async () => {
-    const userId = user_data[0].user_id;
+    const userId = user.user_id;
     const response = await ProcessService.getProcessAssesment(userId);
     console.log(response)
     setProcessList(response.info)

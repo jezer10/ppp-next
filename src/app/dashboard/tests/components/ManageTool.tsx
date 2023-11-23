@@ -6,7 +6,7 @@ import { CreateTool, Dimension, IDimension, Item } from "../interfaces/dimension
 import { useEffect, useState } from "react";
 import Dropdown from "./Dropdown";
 import { XMarkIcon, FolderIcon } from "@heroicons/react/24/solid";
-import { config } from "@/config";
+import  config  from "@/config";
 import { ConfirmAlert, InfoAlert } from "@/components/Alert";
 import { IToolResponse } from "../interfaces/ToolResponse";
 
