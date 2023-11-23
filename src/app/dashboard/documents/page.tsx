@@ -21,8 +21,8 @@ import {
 import Image from "next/image";
 
 const documentList = [
-  { id: 1, name: 'Ficha de evaluación tutor empresarial', enabled: false },
-  { id: 2,name : 'Ficha de evaluación tutor academico', enabled: true },
+  { id: 1, name: "Ficha de evaluación tutor empresarial", enabled: false },
+  { id: 2, name: "Ficha de evaluación tutor academico", enabled: true },
 ];
 
 export default function Documents() {
@@ -253,7 +253,7 @@ export default function Documents() {
         {xd!.map((document, id) => (
           <div key={id} className="group flex flex-col gap-1">
             <div className="relative h-40 rounded-lg">
-              {document.enabled ? (
+              {!document.enabled ? (
                 <></>
               ) : (
                 <>
@@ -294,12 +294,7 @@ function DocumentPreview({ fileRoute }: { fileRoute: string }) {
   const googleDocsViewerLink = `https://drive.google.com/viewerng/viewer?embedded=true&url=${encodedURL}`;
 
   return (
-    <iframe
-      src={googleDocsViewerLink}
-      width="100%"
-      height="100%"
-      style={{ border: "none" }}
-    ></iframe>
+    <iframe src={googleDocsViewerLink} width="100%" height="100%"></iframe>
   );
 }
 
