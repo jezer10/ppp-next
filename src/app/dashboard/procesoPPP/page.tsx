@@ -163,6 +163,8 @@ export default function ProcesoPPP() {
                   src="https://file.rendit.io/n/TiCox1JZedst2VcFKT9Z.svg"
                   id="Subtract1"
                   className="w-10"
+                  width={10}
+                  height={10}
                 />
               </div>
             </div>
@@ -299,6 +301,8 @@ export default function ProcesoPPP() {
                       alt="document"
                       src="https://file.rendit.io/n/J91kBKSuVCr8QvmHzqDi.svg"
                       className="w-4 shrink-0"
+                      width={0}
+                      height={0}
                     />
                     <div className="mr-0 flex w-[356px] flex-col items-start gap-1">
                       <div className="font-sans text-xs font-light text-[#757575]">
@@ -317,6 +321,8 @@ export default function ProcesoPPP() {
                       alt="document"
                       src="https://file.rendit.io/n/9vwwv3BdiuKUYOlQG3Hc.svg"
                       className="w-5"
+                      width={0}
+                      height={0}
                     />
                     <div className="text-center font-sans text-xs font-light text-[#767070]">
                       Arrastre y suelte el archivo{" "}
