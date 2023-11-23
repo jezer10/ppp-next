@@ -1,7 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Docxtemplater from "docxtemplater";
 import saveAs from "file-saver";
-import { register } from "module";
 import PizZip from "pizzip";
 import { useForm } from "react-hook-form";
 

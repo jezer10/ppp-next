@@ -150,8 +150,6 @@ export default function Documents() {
     <>
       {isOpen && (
         <form onSubmit={handleSubmit(onSubmit)}>
-          {" "}
-          {/* Añade tu form aquí */}
           <div className="absolute inset-0 z-20 flex h-full justify-center overflow-y-auto  bg-black/50">
             <div className="w-full max-w-xl   rounded-lg ">
               <div className="relative  h-auto overflow-hidden rounded-lg  bg-white p-8  text-[#757575] shadow">
@@ -249,10 +247,10 @@ export default function Documents() {
           </div>
         </form>
       )}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-3 gap-4">
         {xd!.map((document, id) => (
           <div key={id} className="group flex flex-col gap-1">
-            <div className="relative h-40 rounded-lg">
+            <div className="relative h-40 md:h-56 rounded-lg">
               {!document.enabled ? (
                 <></>
               ) : (
@@ -278,7 +276,7 @@ export default function Documents() {
         ))}
         <div
           onClick={openModal}
-          className="flex h-40 cursor-pointer items-center justify-center rounded-lg bg-[#E2E2E2] p-6 transition-colors  hover:bg-opacity-50"
+          className="flex h-56 cursor-pointer items-center justify-center rounded-lg bg-[#E2E2E2] p-6 transition-colors  hover:bg-opacity-50"
         >
           <div className="aspect-square h-full rounded-full border-4 border-dashed border-white p-6 text-white">
             <PlusIcon />

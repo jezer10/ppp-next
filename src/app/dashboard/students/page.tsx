@@ -56,7 +56,6 @@ export default function Students() {
   const fetchProcesses = async () => {
     const response: IApiResponse<IProcess[]> =
       await ProcessService.getAllProcesses();
-    console.log(response.info);
     setProcessList(response.info);
   };
 
@@ -222,26 +221,23 @@ export default function Students() {
     practicesMode: null,
   };
 
-  const initDoubleModalValues: IManageDocument = {
-    studentName: null,
-    documentName: null,
-    onClose: () => {},
-  };
-
   const [modalOpen, setModalOpen] = useState(false);
   const [doubleModalOpen, setDoubleModalOpen] = useState(false);
   const [isLoadingManageDocument, setIsLoadingManageDocument] = useState(false);
 
   const [selectedStudentData, setSelectedStudentData] =
     useState<IModalProps>(initModalValues);
-  const [selectedDocumentData, setSelectedDocumentData] =
-    useState<IManageDocument>(initDoubleModalValues);
+  const [selectedDocumentData, setSelectedDocumentData] = useState<any>();
 
   const handleModalToggle = () => {
     setModalOpen(!modalOpen);
   };
 
-  const handleDoubleModalToggle = () => {
+  const handleDoubleModalToggle = (isUpdated: boolean = false) => {
+    if (isUpdated) {
+      console.log(isUpdated);
+      fetchProcesses();
+    }
     setDoubleModalOpen(!doubleModalOpen);
   };
 
@@ -250,13 +246,17 @@ export default function Students() {
     const docFound = itemFound
       ? itemFound.Etapa.find((y) => y.type_id === docId)
       : null;
-
-    const documentFound: IManageDocument = {
-      studentName: `${itemFound!.Estudiante.Persona?.name} ${itemFound!
-        .Estudiante.Persona?.surname}`,
-      documentName: docFound?.filename!,
-    };
-    setSelectedDocumentData(documentFound);
+    console.log(docFound);
+    const { path, filename, state, observaciones, step_id } = docFound!;
+    const { name, surname } = itemFound?.Estudiante.Persona!;
+    setSelectedDocumentData({
+      path,
+      filename,
+      state,
+      observaciones,
+      step_id,
+      fullName: `${name} ${surname}`,
+    });
     setDoubleModalOpen(true);
   };
 
@@ -264,8 +264,7 @@ export default function Students() {
     <>
       <DoubleModal isOpen={doubleModalOpen} onClose={handleDoubleModalToggle}>
         <ManageDocument
-          studentName={selectedDocumentData.studentName}
-          documentName={selectedDocumentData.documentName}
+          document={selectedDocumentData}
           onClose={handleDoubleModalToggle}
           isLoading={isLoadingManageDocument}
         />
@@ -295,64 +294,65 @@ export default function Students() {
             </button>
           </div>
 
-          <div className="flex flex-col gap-4 ">
-            <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
-              <div>Código</div>
-              <div>Nombre Completo</div>
-              <div>E.P.</div>
-              <div>Ciclo</div>
-              <div>Estado</div>
-              <div>Supervisor</div>
-              <div>Tiempo</div>
-              <div>Opciones</div>
-            </div>
+          <div className="w-full overflow-x-auto">
+            <div className="flex flex-col gap-4 ">
+              <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
+                <div>Código</div>
+                <div>Nombre Completo</div>
+                <div>E.P.</div>
+                <div>Ciclo</div>
+                <div>Estado</div>
+                <div>Supervisor</div>
+                <div>Tiempo</div>
+                <div>Opciones</div>
+              </div>
 
-            {filteredData.length === 0 ? (
-              <div className="rounded-[0.625rem] bg-[#D1D1D1]">
-                <div className="grid grid-cols-1 items-center rounded-[0.625rem] bg-white px-4 py-6 text-center text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                  <div>
-                    No se encontraron registros que coincidan con el filtro.
+              {filteredData.length === 0 ? (
+                <div className="rounded-[0.625rem] bg-[#D1D1D1]">
+                  <div className="grid grid-cols-1 items-center rounded-[0.625rem] bg-white px-4 py-6 text-center text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                    <div>
+                      No se encontraron registros que coincidan con el filtro.
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <>
-                {currentData.map((item, itemIndex) => (
-                  <div
-                    key={itemIndex}
-                    className="rounded-[0.625rem] bg-[#D1D1D1]"
-                  >
-                    <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                      <div>{item.Estudiante.code}</div>
-                      <div>
-                        {`${item.Estudiante.Persona.name} ${item.Estudiante.Persona.surname}`}
+              ) : (
+                <>
+                  {currentData.map((item, itemIndex) => (
+                    <div
+                      key={itemIndex}
+                      className="rounded-[0.625rem] bg-[#D1D1D1] "
+                    >
+                      <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                        <div className="whitespace-nowrap">{item.Estudiante.code}</div>
+                        <div className="whitespace-nowrap">
+                          {`${item.Estudiante.Persona.name} ${item.Estudiante.Persona.surname}`}
+                        </div>
+                        <div className="whitespace-nowrap">{item.Estudiante.School.name}</div>
+                        <div className="whitespace-nowrap">
+                          {intToRoman(Number(item.Estudiante.Cycle.cycle))}
+                        </div>
+                        <div className="whitespace-nowrap">
+                          <StudentStatusFlag
+                            status={Number(item.Estudiante.state)}
+                          />
+                        </div>
+                        <div  className="flex items-center gap-2 whitespace-nowrap">
+                          <UserIcon className="h-4 w-4" />
+                          {`${item.Supervisor.Docente.Persona.name} ${item.Supervisor.Docente.Persona.surname}`}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <ClockIcon className="h-4 w-4" /> 4M
+                        </div>
+                        <div className="rounded-r-lg">
+                          <ProcessOptions itemIndex={item.process_id} />
+                        </div>
                       </div>
-                      <div>{item.Estudiante.School.name}</div>
-                      <div>
-                        {intToRoman(Number(item.Estudiante.Cycle.cycle))}
-                      </div>
-                      <div>
-                        <StudentStatusFlag
-                          status={Number(item.Estudiante.state)}
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <UserIcon className="h-4 w-4" />
-                        {`${item.Supervisor.Docente.Persona.name} ${item.Supervisor.Docente.Persona.surname}`}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <ClockIcon className="h-4 w-4" /> 4M
-                      </div>
-                      <div className="rounded-r-lg">
-                        <ProcessOptions itemIndex={item.process_id} />
-                      </div>
-                    </div>
-                    {item.show && (
-                      <div className="flex items-center gap-4  rounded-b-lg p-4">
-                        {item.Etapa.map((document: IEtapa, documentIndex) => (
-                          <div
-                            key={documentIndex}
-                            className={`flex items-center gap-2 rounded-[0.625rem] px-4 py-3 
+                      {item.show && (
+                        <div className="flex items-center gap-4  rounded-b-lg p-4">
+                          {item.Etapa.map((document: IEtapa, documentIndex) => (
+                            <div
+                              key={documentIndex}
+                              className={`flex items-center gap-2 rounded-[0.625rem] px-4 py-3 
                               
                               ${
                                 document.state === "0"
@@ -362,58 +362,41 @@ export default function Students() {
                                     : "bg-[#FE7272] text-white "
                               }
                               `}
-                          >
-                            <PDFIcon className=" h-6 w-6 flex-none" />
-                            <div>
-                              <div className="whitespace-nowrap text-[0.625rem] font-bold">
-                                {document.Tipo.name}
-                              </div>
-                              <div className="text-[0.4375rem] font-light">
-                                {document.state === "0"
-                                  ? "Pendiente"
-                                  : document.state === "1"
-                                    ? "Validado"
-                                    : "Rechazado"}
-                              </div>
-                            </div>
-                            <button
-                              onClick={() =>
-                                handleManageDocument(
-                                  item.process_id,
-                                  document.type_id,
-                                )
-                              }
-                              className="h-6 w-6 rounded-lg p-1 hover:bg-white/20"
                             >
-                              <EyeIcon />
-                            </button>
-                          </div>
-                          // <div
-                          //   key={documentIndex}
-                          //   className="flex items-center gap-2 rounded-[0.625rem] bg-[#55E38E] px-4 py-3 text-white"
-                          // >
-                          //   <PDFIcon className=" h-6 w-6 flex-none" />
-                          //   <div>
-                          //     <div className="whitespace-nowrap text-[0.625rem] font-bold">
-                          //       {document.Tipo.name}
-                          //     </div>
-                          //     <div className="text-[0.4375rem] font-light">
-                          //       Validado
-                          //     </div>
-                          //   </div>
-                          //   <button onClick={() => handleManageDocument(item.process_id, document.type_id)} className="h-6 w-6 rounded-lg p-1 hover:bg-white/20">
-                          //     <EyeIcon />
-                          //   </button>
-                          // </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </>
-            )}
+                              <PDFIcon className=" h-6 w-6 flex-none" />
+                              <div>
+                                <div className="whitespace-nowrap text-[0.625rem] font-bold">
+                                  {document.Tipo.name}
+                                </div>
+                                <div className="text-[0.4375rem] font-light">
+                                  {document.state === "0"
+                                    ? "Pendiente"
+                                    : document.state === "1"
+                                      ? "Validado"
+                                      : "Rechazado"}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() =>
+                                  handleManageDocument(
+                                    item.process_id,
+                                    document.type_id,
+                                  )
+                                }
+                                className="h-6 w-6 rounded-lg p-1 hover:bg-white/20"
+                              >
+                                <EyeIcon />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
           </div>
-
           {filteredData.length !== 0 && (
             <>
               <div className="flex items-center justify-between">

@@ -9,14 +9,12 @@ import {
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 import Image from "next/image";
 import log_sis from "@/../public/logo_sistemas.png";
 import log_adv from "@/../public/logo_adventista.png";
 import log_grp from "@/../public/group.svg";
-
-import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
   const [visible, setVisible] = useState(false);
@@ -61,18 +59,6 @@ const Home = () => {
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <div className=" h-screen overflow-hidden   px-16">
         <div className="absolute inset-0 -z-20 h-full bg-gradient-to-r from-[#0F3971] to-white"></div>
         <Image

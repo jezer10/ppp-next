@@ -8,27 +8,27 @@ const bayon = Bayon({ subsets: ["latin"], weight: ["400"] });
 export default function Dashboard() {
   return (
     <div className="flex h-full flex-col gap-4">
-      <div className="relative rounded-xl bg-gradient-to-r from-[#FD6500] to-[#FF802C] px-8  pb-8 pt-12 text-white">
+      <div className="relative rounded-xl bg-gradient-to-r from-[#FD6500] to-[#FF802C] px-4 py-2 md:px-8  md:pb-8 md:pt-12  text-white">
         <div className={`${bayon.className}`}>
           <div className="absolute inset-0  ">
             <div className="relative">
               <span
-                className={` absolute -left-1 -top-3  text-8xl  tracking-[1.5rem] text-white/10  `}
+                className={` absolute md:-left-1 -top-1 md:-top-3 text-2xl md:text-8xl tracking-[0.5rem] md:tracking-[1.5rem] text-white/10  `}
               >
                 Novedades
               </span>
             </div>
           </div>
-          <div className=" text-8xl leading-[3.5rem]">Novedades</div>
+          <div className=" text-2xl md:text-8xl md:leading-[3.5rem]">Novedades</div>
         </div>
-        <div className="mt-2 font-sans text-sm font-thin">
+        <div className="mt-2 font-sans text-[8px] md:text-sm font-thin">
           Ahora podrás gestionar y monitorizar las PPP de los estudiantes desde
           donde éstes.
         </div>
         <Image
           src={nov_img}
           alt="person"
-          className="absolute bottom-0 right-36"
+          className="absolute bottom-0 right-0 md:right-36 w-16"
         />
       </div>
       <div className="flex h-12 items-center justify-center gap-2">
@@ -41,7 +41,7 @@ export default function Dashboard() {
           />
         ))}
       </div>
-      <div className="grid h-full w-full grid-cols-3 gap-12 font-bold text-white">
+      <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-4 md:gap-12 font-bold text-white">
         {[1, 2, 3].map((element, idx) => (
           <div
             key={idx}

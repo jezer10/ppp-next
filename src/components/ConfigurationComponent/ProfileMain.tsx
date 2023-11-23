@@ -30,30 +30,28 @@ export const ProfileMain = () => {
   ];
   return (
     <>
-      <div className="grid h-[100%] w-[100%] grid-cols-2 gap-4  p-8">
-        {settings_options.map((option) => {
-          return (
-            <Link href={option.link} key={option.id}>
-              <div className="card" key={option.id}>
-                <div className="flex w-[80%] items-center  justify-center">
-                  <p className="text-[24px] font-bold">
-                    {option.title.toUpperCase()}
-                  </p>
-                </div>
+      <div className="grid h-full w-full gap-4   md:grid-cols-2 ">
+        {settings_options.map((option) => (
+          <Link
+            href={option.link}
+            key={option.id}
+            className="flex h-28 md:h-56 rounded-lg bg-white overflow-hidden shadow hover:shadow-lg"
+          >
+            <div className="flex h-full w-3/5 items-center  justify-center text-[24px] font-bold">
+              {option.title.toUpperCase()}
+            </div>
 
-                <div className="card__image">
-                  <Image
-                    src={`/svg/${option.icon}`}
-                    className="w-[200px]"
-                    width={0}
-                    height={0}
-                    alt="profile.svg"
-                  />
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+            <div className="h-full w-2/5 bg-[#0F3971] px-4">
+              <Image
+                src={`/svg/${option.icon}`}
+                className="h-full w-full object-contain"
+                alt="profile.svg"
+                width={0}
+                height={0}
+              />
+            </div>
+          </Link>
+        ))}
       </div>
     </>
   );

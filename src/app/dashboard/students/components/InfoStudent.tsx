@@ -18,7 +18,7 @@ function InfoStudent(modalProps: IModalProps) {
                 Nombres y Apellidos
               </span>
               <span className="text-sm text-[#bababa]">
-                {modalProps.fullName !== null ? modalProps.fullName : "-"}
+                {modalProps.fullName ?? "-"}
               </span>
             </div>
             <div className="flex flex-col">
@@ -26,7 +26,7 @@ function InfoStudent(modalProps: IModalProps) {
                 Código
               </span>
               <span className="text-sm text-[#bababa]">
-                {modalProps.codeStudent != null ? modalProps.codeStudent : "-"}
+                {modalProps.codeStudent ?? "-"}
               </span>
             </div>
             <div className="flex flex-col">
@@ -34,7 +34,7 @@ function InfoStudent(modalProps: IModalProps) {
                 Escuela Profesional
               </span>
               <span className="text-sm text-[#bababa]">
-                {modalProps.school != null ? modalProps.school : "-"}
+                {modalProps.school ?? "-"}
               </span>
             </div>
             <div className="flex flex-col">
@@ -42,7 +42,7 @@ function InfoStudent(modalProps: IModalProps) {
                 Ciclo
               </span>
               <span className="text-sm text-[#bababa]">
-                {modalProps.cycle != null ? modalProps.cycle : "-"}
+                {modalProps.cycle ?? "-"}
               </span>
             </div>
           </div>
@@ -50,7 +50,7 @@ function InfoStudent(modalProps: IModalProps) {
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-[#7e7e7e]"> DNI</span>
               <span className="text-sm text-[#bababa]">
-                {modalProps.DNI != null ? modalProps.DNI : "-"}
+                {modalProps.DNI ?? "-"}
               </span>
             </div>
             <div className="flex flex-col">
@@ -58,7 +58,7 @@ function InfoStudent(modalProps: IModalProps) {
                 Celular
               </span>
               <span className="text-sm text-[#bababa]">
-                {modalProps.phone != null ? modalProps.phone : "-"}
+                {modalProps.phone ?? "-"}
               </span>
             </div>
             <div className="flex flex-col">
@@ -66,7 +66,7 @@ function InfoStudent(modalProps: IModalProps) {
                 Correo
               </span>
               <span className="text-sm text-[#bababa]">
-                {modalProps.email != null ? modalProps.email : "-"}
+                {modalProps.email ?? "-"}
               </span>
             </div>
             <div className="flex flex-col">
@@ -74,9 +74,7 @@ function InfoStudent(modalProps: IModalProps) {
                 Modalidad de PPP
               </span>
               <span className="text-sm text-[#bababa]">
-                {modalProps.practicesMode != null
-                  ? modalProps.practicesMode
-                  : "-"}
+                {modalProps.practicesMode ?? "-"}
               </span>
             </div>
           </div>
