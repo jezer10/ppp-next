@@ -1,16 +1,22 @@
-"use client"
-import { LoadingComponent } from "@/components/LoadingComponent";
+"use client";
 import { Menu, Transition } from "@headlessui/react";
-import { ChevronDownIcon, ClockIcon, DocumentIcon, FunnelIcon, IdentificationIcon, MagnifyingGlassIcon, UserGroupIcon, UserIcon } from "@heroicons/react/24/solid";
+import {
+  ChevronDownIcon,
+  FunnelIcon,
+  MagnifyingGlassIcon,
+  UserGroupIcon,
+  UserIcon,
+} from "@heroicons/react/24/solid";
 import { Fragment, useEffect, useState } from "react";
-import { IModalProps } from "../students/interfaces/modal";
-import { intToRoman } from "@/utils/romanConverter";
-import { IProcess } from "../students/interfaces/process";
-import { ProcessService } from "@/services/process.service";
+
 import { ISupervisor } from "./interfaces/supervisor";
 import Modal from "@/components/Modal";
 import { StudentAssugnet } from "./components/StudentAssigned";
-import { getAllSupervisorService, getStudentsForAssignService } from "@/services/supervisor.service";
+import {
+  getAllSupervisorService,
+  getStudentsForAssignService,
+} from "@/services/supervisor.service";
+import { IApiResponse } from "../students/interfaces/process";
 
 export default function Supervisors() {
   const [studentList, setStudentList] = useState<any[]>([]);
@@ -21,21 +27,21 @@ export default function Supervisors() {
     setModalOpen(!modalOpen);
   };
   const fetchProcesses = async () => {
-    const response: IApiResponse<ISupervisor[]> = await getAllSupervisorService();
-    console.log(response.info)
-    setSupervisorList(response.info)
-  }
+    const response: IApiResponse<ISupervisor[]> =
+      await getAllSupervisorService();
+    console.log(response.info);
+    setSupervisorList(response.info);
+  };
 
-  const listStudentsAssigments = async (supervisor_id : number) => {
-    const response = await getStudentsForAssignService(supervisor_id)
+  const listStudentsAssigments = async (supervisor_id: number) => {
+    const response = await getStudentsForAssignService(supervisor_id);
 
     if (response.status === 200) {
-      console.log(response.info)
-      setStudentList(response.info)
-      setSuperSelected(supervisor_id)
+      console.log(response.info);
+      setStudentList(response.info);
+      setSuperSelected(supervisor_id);
     }
-  }
-
+  };
 
   useEffect(() => {
     fetchProcesses();
@@ -79,9 +85,9 @@ export default function Supervisors() {
     {
       icon: UserGroupIcon,
       name: "Asignar Practicantes",
-      actionFunction: (id : number) => { 
-        listStudentsAssigments(id)
-        setModalOpen(true)
+      actionFunction: (id: number) => {
+        listStudentsAssigments(id);
+        setModalOpen(true);
       },
     },
     // { icon: TrashIcon, name: "Eliminar", actionFunction: () => { } },
@@ -113,8 +119,9 @@ export default function Supervisors() {
                     <button
                       // onClick={() => actionFunction(props.itemIndex)}
                       onClick={() => actionFunction(props.itemIndex)}
-                      className={`${active && "bg-[#EEEEEE]"
-                        } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
+                      className={`${
+                        active && "bg-[#EEEEEE]"
+                      } flex w-full items-center gap-2 whitespace-nowrap px-2 py-1 text-[0.5rem] text-[#757575]`}
                     >
                       <Icon className="w-[0.75rem]" />
                       {name}
@@ -132,14 +139,15 @@ export default function Supervisors() {
   function SupervisorStatusFlag({ status }: { status: number }) {
     return (
       <span
-        className={`rounded px-2 py-0.5  text-white ${status === 0
-          ? "bg-[#29EB77]"
-          : status > 0
-            ? "bg-[#FFC700]"
-            : status === 10
-              ? "bg-[#FC6767]"
-              : "bg-[#49D3FE]"
-          }`}
+        className={`rounded px-2 py-0.5  text-white ${
+          status === 0
+            ? "bg-[#29EB77]"
+            : status > 0
+              ? "bg-[#FFC700]"
+              : status === 10
+                ? "bg-[#FC6767]"
+                : "bg-[#49D3FE]"
+        }`}
       >
         {status === 0
           ? "Sin Asignar"
@@ -151,66 +159,68 @@ export default function Supervisors() {
       </span>
     );
   }
-  
-  const [itemsPerPage] = useState(4);
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredData = supervisorList.filter(item =>
-    item.name.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
-    item.surname.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
-    item.code.toLowerCase().trim().includes(searchTerm.toLowerCase())
+  const [itemsPerPage] = useState(4);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredData = supervisorList.filter(
+    (item) =>
+      item.name.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
+      item.surname.toLowerCase().trim().includes(searchTerm.toLowerCase()) ||
+      item.code.toLowerCase().trim().includes(searchTerm.toLowerCase()),
   );
 
   const [currentPage, setCurrentPage] = useState(1);
 
-    // Calcula las páginas totales
-    const totalPages = Math.max(Math.ceil(filteredData.length / itemsPerPage), 1);
+  // Calcula las páginas totales
+  const totalPages = Math.max(Math.ceil(filteredData.length / itemsPerPage), 1);
 
-    // Asegurarse de que currentPage no sea mayor que totalPages
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
+  // Asegurarse de que currentPage no sea mayor que totalPages
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages);
+  }
+  // Filtra los datos en función de la página actual
+  const startIndex = Math.max((currentPage - 1) * itemsPerPage, 0);
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
+  const currentData = filteredData.slice(startIndex, endIndex);
+
+  // Cambia de página
+  const handlePageChange = (page: any) => {
+    console.log(page);
+    setCurrentPage(page);
+  };
+
+  // Cambia de página hacia atrás
+  const goToPreviousPage = () => {
+    console.log(currentPage);
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
-    // Filtra los datos en función de la página actual
-    const startIndex = Math.max((currentPage - 1) * itemsPerPage, 0);
-    const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
-    const currentData = filteredData.slice(startIndex, endIndex);
-  
-    // Cambia de página
-    const handlePageChange = (page: any) => {
-      console.log(page)
-      setCurrentPage(page);
-    };
-  
-    // Cambia de página hacia atrás
-    const goToPreviousPage = () => {
-      console.log(currentPage)
-      if (currentPage > 1) {
-        setCurrentPage(currentPage - 1);
-      }
-    };
-  
-    // Cambia de página hacia adelante
-    const goToNextPage = () => {
-      if (currentPage < totalPages) {
-        setCurrentPage(currentPage + 1);
-      }
-    };
-  
-    // Restablece currentPage a 1 cuando se borra el término de búsqueda
-    const handleSearchTermChange = (newSearchTerm: any) => {
-      setSearchTerm(newSearchTerm);
-      setCurrentPage(1);
-    };
-  return <>
-  <Modal
-        isOpen={modalOpen}
-        onClose={handleModalToggle}
-      >
-        <StudentAssugnet data={studentList} supervisor={superSelected} listStudentsAssigments={listStudentsAssigments} fetchProcesses={fetchProcesses}/>
+  };
 
-        
-        </Modal>
-   <div className="h-full">
+  // Cambia de página hacia adelante
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Restablece currentPage a 1 cuando se borra el término de búsqueda
+  const handleSearchTermChange = (newSearchTerm: any) => {
+    setSearchTerm(newSearchTerm);
+    setCurrentPage(1);
+  };
+  return (
+    <>
+      <Modal isOpen={modalOpen} onClose={handleModalToggle}>
+        <StudentAssugnet
+          data={studentList}
+          supervisor={superSelected}
+          listStudentsAssigments={listStudentsAssigments}
+          fetchProcesses={fetchProcesses}
+        />
+      </Modal>
+      <div className="h-full">
         <div className="flex h-full flex-col gap-8">
           <div className="flex items-stretch justify-end gap-4">
             <div className="flex overflow-hidden rounded-lg ">
@@ -242,27 +252,33 @@ export default function Supervisors() {
 
             {filteredData.length === 0 ? (
               <div className="rounded-[0.625rem] bg-[#D1D1D1]">
-                <div className="grid grid-cols-1 items-center rounded-[0.625rem] text-center bg-white px-4 py-6 text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                  <div>No se encontraron registros que coincidan con el filtro.</div>
+                <div className="grid grid-cols-1 items-center rounded-[0.625rem] bg-white px-4 py-6 text-center text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
+                  <div>
+                    No se encontraron registros que coincidan con el filtro.
+                  </div>
                 </div>
               </div>
             ) : (
               <>
                 {currentData.map((item, itemIndex) => (
-                  <div key={itemIndex} className="rounded-[0.625rem] bg-[#D1D1D1]">
+                  <div
+                    key={itemIndex}
+                    className="rounded-[0.625rem] bg-[#D1D1D1]"
+                  >
                     <div className="grid grid-cols-6 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
                       <div>{item.code}</div>
                       <div>{item.name + " " + item.surname}</div>
                       <div>{"Ingeniería de Sistemas"}</div>
                       <div>
-                        <SupervisorStatusFlag status={Number(item.students_assigned.length)} />
+                        <SupervisorStatusFlag
+                          status={Number(item.students_assigned.length)}
+                        />
                       </div>
                       <div>{item.students_assigned.length}</div>
                       <div className="rounded-r-lg">
                         <ProcessOptions itemIndex={item.supervisor_id} />
                       </div>
                     </div>
-                   
                   </div>
                 ))}
               </>
@@ -306,5 +322,6 @@ export default function Supervisors() {
           )} */}
         </div>
       </div>
-  </>;
+    </>
+  );
 }

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,143 +7,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Acceso {
-  access_id  Int          @id @default(autoincrement())
-  name       String
-  state      String
-  Rol_acceso Rol_acceso[]
+model Dimension {
+  dimension_id          Int                     @id @default(autoincrement())
+  name                  String
+  Instrumento_Dimension Instrumento_Dimension[]
 }
 
-model Rol_acceso {
-  access_roles_id Int    @id @default(autoincrement())
-  role            Rol    @relation(fields: [role_id], references: [role_id])
-  role_id         Int
-  acceso          Acceso @relation(fields: [access_id], references: [access_id])
-  access_id       Int
-}
-
-model Rol {
-  role_id     Int           @id @default(autoincrement())
-  name        String
-  state       String
-  Rol_acceso  Rol_acceso[]
-  Rol_usuario Rol_usuario[]
-}
-
-model Rol_usuario {
-  role_user_id Int  @id @default(autoincrement())
-  user         User @relation(fields: [user_id], references: [user_id])
-  user_id      Int
-  rol          Rol  @relation(fields: [role_id], references: [role_id])
-  role_id      Int
+model Item {
+  item_id               Int                   @id @default(autoincrement())
+  name                  String
+  tool_dimension_id     Int
+  Instrumento_Dimension Instrumento_Dimension @relation(fields: [tool_dimension_id], references: [tool_dimension_id], onDelete: NoAction, onUpdate: NoAction, map: "Tool_dimension_fkey")
+  Nivel                 Nivel[]
 }
 
 model User {
-  user_id     Int           @id @default(autoincrement())
-  persona     Persona       @relation(fields: [person_id], references: [person_id])
-  person_id   Int
-  username    String
-  password    String
-  photo       String
-  Rol_usuario Rol_usuario[]
-}
-
-model Persona {
-  person_id  Int          @id @default(autoincrement())
-  name       String
-  surname    String
-  phone      String
-  dni        String
-  email      String
-  address    String
-  department String
-  district   String
-  province   String
-  User       User[]
-  Docente    Docente[]
-  Estudiante Estudiante[]
-}
-
-model Docente {
-  teacher_id Int          @id @default(autoincrement())
-  persona    Persona      @relation(fields: [person_id], references: [person_id])
-  person_id  Int
-  code       Int
-  Supervisor Supervisor[]
+  user_id         Int           @id @default(autoincrement())
+  person_id       Int
+  username        String
+  password        String
+  photo           String?
+  state           String?       @default(dbgenerated("1"))
+  user_created_at DateTime?     @db.Date
+  Rol_usuario     Rol_usuario[]
+  Persona         Persona       @relation(fields: [person_id], references: [person_id])
 }
 
 model Supervisor {
   supervisor_id Int       @id @default(autoincrement())
-  docente       Docente   @relation(fields: [teacher_id], references: [teacher_id])
   teacher_id    Int
   Proceso       Proceso[]
+  Docente       Docente   @relation(fields: [teacher_id], references: [teacher_id])
 }
 
-model Estudiante {
-  student_id Int       @id @default(autoincrement())
-  persona    Persona   @relation(fields: [person_id], references: [person_id])
+model Cycle {
+  cycle_id         Int          @id @default(autoincrement())
+  cycle            String
+  status           String?
+  cycle_created_at DateTime?    @db.Date
+  Estudiante       Estudiante[]
+}
+
+model School {
+  school_id         Int          @id @default(autoincrement())
+  name              String
+  status            String?
+  school_created_at DateTime?    @db.Date
+  Estudiante        Estudiante[]
+}
+
+model Acceso {
+  access_id         Int          @id @default(autoincrement())
+  name              String
+  state             String
+  url               String?
+  icon              String
+  access_created_at DateTime?    @db.Date
+  father_id         Int?
+  Rol_acceso        Rol_acceso[]
+}
+
+model Docente {
+  teacher_id Int          @id @default(autoincrement())
   person_id  Int
-  code       String
-  state      String
-  Proceso    Proceso[]
-}
-
-model Proceso {
-  process_id    Int         @id @default(autoincrement())
-  estudiante    Estudiante  @relation(fields: [student_id], references: [student_id])
-  student_id    Int
-  supervisor    Supervisor  @relation(fields: [supervisor_id], references: [supervisor_id])
-  supervisor_id Int
-  empresa       Empresa     @relation(fields: [company_id], references: [company_id])
-  company_id    Int
-  type          String
-  state         String
-  Evalucion     Evalucion[]
-}
-
-model Evalucion {
-  assesment_id      Int         @id @default(autoincrement())
-  proceso           Proceso     @relation(fields: [proceso_id], references: [process_id])
-  proceso_id        Int
-  instrumento       Instrumento @relation(fields: [assesment_tool_id], references: [assesment_tool_id])
-  assesment_tool_id Int
-  start_date        DateTime
-  end_date          DateTime
-  is_virtual        DateTime
-  type              String
-  Nivel             Nivel[]
-}
-
-model Nivel {
-  level_id     Int       @id @default(autoincrement())
-  evaluacion   Evalucion @relation(fields: [assesment_id], references: [assesment_id])
-  assesment_id Int
-  item         Item      @relation(fields: [item_id], references: [item_id])
-  item_id      Int
-  level        String
-}
-
-model Item {
-  item_id      Int       @id @default(autoincrement())
-  dimension    Dimension @relation(fields: [dimension_id], references: [dimension_id])
-  dimension_id Int
-  name         String
-  Nivel        Nivel[]
-}
-
-model Dimension {
-  dimension_id      Int         @id @default(autoincrement())
-  instrumento       Instrumento @relation(fields: [assesment_tool_id], references: [assesment_tool_id])
-  assesment_tool_id Int
-  name              String
-  Item              Item[]
-}
-
-model Instrumento {
-  assesment_tool_id Int         @id @default(autoincrement())
-  name              String
-  Evalucion         Evalucion[]
-  Dimension         Dimension[]
+  code       Int
+  Persona    Persona      @relation(fields: [person_id], references: [person_id])
+  Supervisor Supervisor[]
 }
 
 model Empresa {
@@ -160,19 +86,146 @@ model Empresa {
   Proceso      Proceso[]
 }
 
+model Estudiante {
+  student_id         Int       @id @default(autoincrement())
+  person_id          Int
+  code               String
+  state              String
+  cycle_id           Int?
+  school_id          Int?
+  introduccion_visto Boolean?  @default(false)
+  Cycle              Cycle?    @relation(fields: [cycle_id], references: [cycle_id], onDelete: NoAction, onUpdate: NoAction, map: "Cycle_cycle_id_fkey")
+  Persona            Persona   @relation(fields: [person_id], references: [person_id])
+  School             School?   @relation(fields: [school_id], references: [school_id], onDelete: NoAction, onUpdate: NoAction, map: "School_school_id_fkey")
+  Proceso            Proceso[]
+}
+
 model Etapa {
-  step_id    Int    @id @default(autoincrement())
-  tipo       Tipo   @relation(fields: [type_id], references: [type_id])
-  type_id    Int
-  process_id Int
-  filename   String
-  path       String
-  created_at String
-  state      String
+  step_id       Int     @id @default(autoincrement())
+  type_id       Int
+  process_id    Int
+  filename      String
+  path          String
+  observaciones String
+  created_at    String
+  state         String
+  Proceso       Proceso @relation(fields: [process_id], references: [process_id], onDelete: NoAction, onUpdate: NoAction, map: "Etapa_proceso_id_fkey")
+  Tipo          Tipo    @relation(fields: [type_id], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "Etapa_tipo_id_fkey")
+}
+
+model Evaluacion {
+  assesment_id      Int         @id(map: "Evalucion_pkey") @default(autoincrement())
+  proceso_id        Int
+  assesment_tool_id Int
+  start_date        DateTime
+  end_date          DateTime
+  type              String
+  created_at        DateTime?   @db.Date
+  status            Int?
+  is_virtual        Boolean?
+  Instrumento       Instrumento @relation(fields: [assesment_tool_id], references: [assesment_tool_id], map: "Evalucion_assesment_tool_id_fkey")
+  Proceso           Proceso     @relation(fields: [proceso_id], references: [process_id], map: "Evalucion_proceso_id_fkey")
+  Nivel             Nivel[]
+}
+
+model Instrumento {
+  assesment_tool_id     Int                     @id @default(autoincrement())
+  name                  String
+  type                  Int?
+  Evaluacion            Evaluacion[]
+  Instrumento_Dimension Instrumento_Dimension[]
+}
+
+model Instrumento_Dimension {
+  tool_dimension_id Int         @id @default(autoincrement())
+  assesment_tool_id Int
+  dimension_id      Int
+  Dimension         Dimension   @relation(fields: [dimension_id], references: [dimension_id], onDelete: NoAction, onUpdate: NoAction, map: "Dimension_fkey")
+  Instrumento       Instrumento @relation(fields: [assesment_tool_id], references: [assesment_tool_id], onDelete: NoAction, onUpdate: NoAction, map: "Instrumento_fkey")
+  Item              Item[]
+}
+
+model Nivel {
+  level_id     Int        @id @default(autoincrement())
+  assesment_id Int
+  item_id      Int
+  level        String
+  Evaluacion   Evaluacion @relation(fields: [assesment_id], references: [assesment_id])
+  Item         Item       @relation(fields: [item_id], references: [item_id])
+}
+
+model Persona {
+  person_id      Int          @id @default(autoincrement())
+  name           String
+  surname        String
+  phone          String?
+  dni            String
+  email          String?
+  address        String?
+  department     String?
+  district       String?
+  province       String?
+  status         String?      @default(dbgenerated("1"))
+  per_created_at DateTime?    @db.Date
+  Docente        Docente[]
+  Estudiante     Estudiante[]
+  User           User[]
+}
+
+model Proceso {
+  process_id         Int          @id @default(autoincrement())
+  student_id         Int
+  supervisor_id      Int?
+  company_id         Int
+  type               String
+  state              String
+  process_created_at DateTime?    @db.Date
+  Etapa              Etapa[]
+  Evaluacion         Evaluacion[]
+  Empresa            Empresa      @relation(fields: [company_id], references: [company_id])
+  Estudiante         Estudiante   @relation(fields: [student_id], references: [student_id])
+  Supervisor         Supervisor?  @relation(fields: [supervisor_id], references: [supervisor_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Rol {
+  role_id         Int           @id @default(autoincrement())
+  name            String?
+  state           String?       @default(dbgenerated("1"))
+  description     String?
+  role_created_at DateTime?     @db.Date
+  Rol_acceso      Rol_acceso[]
+  Rol_usuario     Rol_usuario[]
+}
+
+model Rol_acceso {
+  access_roles_id         Int       @id @default(autoincrement())
+  role_id                 Int
+  access_id               Int
+  state                   String?   @default(dbgenerated("1"))
+  access_roles_created_at DateTime? @db.Date
+  Acceso                  Acceso    @relation(fields: [access_id], references: [access_id])
+  Rol                     Rol       @relation(fields: [role_id], references: [role_id])
+}
+
+model Rol_usuario {
+  role_user_id         Int       @id @default(autoincrement())
+  user_id              Int
+  role_id              Int
+  role_user_created_at DateTime? @db.Date
+  state                String?   @default(dbgenerated("1"))
+  Rol                  Rol       @relation(fields: [role_id], references: [role_id])
+  User                 User      @relation(fields: [user_id], references: [user_id])
 }
 
 model Tipo {
   type_id Int     @id @default(autoincrement())
   name    String
   Etapa   Etapa[]
+}
+
+model documentos {
+  documents_id Int      @id(map: "documentos_pk") @default(autoincrement())
+  file_route   String?  @db.VarChar
+  name         String?  @db.VarChar
+  enabled      Boolean?
 }
