@@ -6,13 +6,12 @@ import {
   ChevronLeftIcon,
   ChevronDownIcon,
   IdentificationIcon,
-  ArrowTrendingUpIcon,
-  DocumentIcon,
   UserGroupIcon,
   TrashIcon,
-  EyeIcon,
   UserIcon,
   ClockIcon,
+  DocumentIcon,
+  EyeIcon
 } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useRef, useState } from "react";

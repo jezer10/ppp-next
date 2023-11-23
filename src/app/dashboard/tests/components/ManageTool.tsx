@@ -3,14 +3,12 @@ import {
     PlusIcon
 } from "@heroicons/react/20/solid";
 import { CreateTool, Dimension, IDimension, Item } from "../interfaces/dimension";
-import useSWR from "swr";
 import { useEffect, useState } from "react";
 import Dropdown from "./Dropdown";
 import { XMarkIcon, FolderIcon } from "@heroicons/react/24/solid";
 import { config } from "@/config";
 import { ConfirmAlert, InfoAlert } from "@/components/Alert";
 import { IToolResponse } from "../interfaces/ToolResponse";
-import useLoadingStore from '../../../../store/isLoadingStore';
 
 interface ManageToolProps {
     onBack: () => void;

@@ -16,7 +16,7 @@ function Dropdown({ selected, setSelected, data }: DropdownProps) {
   */
 
   return (
-    <div className="w-full relative mx-auto select-none">
+    <div className="w-full relative mx-auto select-none z-50">
       <div
         onClick={() => setIsActive(!isActive)}
         className="py-2 px-4 h-full bg-[#fff] border border-[#757575]/30 text-sm rounded-lg text-[#333] flex items-center justify-between"

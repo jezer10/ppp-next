@@ -16,7 +16,7 @@ import sis_log from "../../public/logo_sistemas.png";
 import {
   ClockIcon, HomeIcon, ChevronLeftIcon, Bars3Icon, ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/20/solid";
-import profile_pic from "../../public/dreyna.jpg";
+import profile_pic from "../../public/reyna_pic.jpeg";
 import { signOut } from "next-auth/react";
 import DynamicHeroIcon from "./DynamicHeroIcon";
 
@@ -32,7 +32,9 @@ const Sidebar = () => {
   const [menuItems, setMenuItems] = useState([]);
 
   async function getAccess() {
+    console.log(roles)
     const accesos = await AccessAuthService(roles[0].role_id)
+    console.log(accesos)
     setMenuItems(accesos.info.filter((e : any) => e.father_id == null))
   }
 
