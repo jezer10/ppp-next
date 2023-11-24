@@ -159,8 +159,8 @@ function Page() {
   };
 
   function fileViewOpen() {
-    console.log(selectedStage?.path);
-    window.open(selectedStage?.path);
+    console.log(selectedStage?.file?.path);
+    window.open(selectedStage?.file?.path);
   }
 
   async function stageChange(idx: number) {
