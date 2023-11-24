@@ -115,15 +115,9 @@ function Page() {
   });
 
   const uploadFile = async () => {
-    const { file, type_id } = selectedStage;
+    const { file, type_id, step_id } = selectedStage;
     const { process_id } = selectedProcess;
-    const body = {
-      process_id,
-      type_id,
-      path: file.path,
-      filename: file.name,
-    };
-    console.log(body);
+
     if (file instanceof File) {
       setIsUploading(true);
       const fileRef = ref(storage, file.name);
@@ -141,12 +135,20 @@ function Page() {
         async () => {
           const downloadURL = await getDownloadURL(fileRef);
           console.log(downloadURL);
-          const response = await fetch(`${config.BACK_URL}/process/stage`, {
+          const response = await fetch(`${config.BACK_URL}/process/stages`, {
             method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
-              process_id: selectedStage?.process_id,
+              process_id,
+              type_id,
+              step_id,
+              path: downloadURL,
+              filename: file.name,
             }),
           });
+          console.log(response);
           setIsUploading(false);
           toast.success("Archivo subido correctamente");
         },
