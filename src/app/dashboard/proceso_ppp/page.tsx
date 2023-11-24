@@ -48,25 +48,24 @@ function Page() {
       file: null,
     });
   };
-
-  useEffect(() => {
-    async function getStageTypes() {
-      if (user?.user_id) {
-        const response = await fetch(
-          `${config.BACK_URL}/process/stages/${user?.user_id}`,
-        );
-        const { data } = await response.json();
-        setStatusPercentage(
-          Math.round(
-            (data.filter((e: any) => e?.step_id).length / data.length) * 100,
-          ),
-        );
-        setStageTypes(data);
-        if (stageTypes.length > 0) {
-          stageChange(0);
-        }
+  async function getStageTypes() {
+    if (user?.user_id) {
+      const response = await fetch(
+        `${config.BACK_URL}/process/stages/${user?.user_id}`,
+      );
+      const { data } = await response.json();
+      setStatusPercentage(
+        Math.round(
+          (data.filter((e: any) => e?.step_id).length / data.length) * 100,
+        ),
+      );
+      setStageTypes(data);
+      if (stageTypes.length > 0) {
+        stageChange(0);
       }
     }
+  }
+  useEffect(() => {
     getStageTypes();
   }, [user?.user_id, stageTypes.length]);
 
@@ -134,7 +133,6 @@ function Page() {
         },
         async () => {
           const downloadURL = await getDownloadURL(fileRef);
-          console.log(downloadURL);
           const response = await fetch(`${config.BACK_URL}/process/stages`, {
             method: "POST",
             headers: {
@@ -148,9 +146,11 @@ function Page() {
               filename: file.name,
             }),
           });
-          console.log(response);
-          setIsUploading(false);
-          toast.success("Archivo subido correctamente");
+          if (response.status == 200) {
+            getStageTypes();
+            setIsUploading(false);
+            toast.success("Archivo subido correctamente");
+          }
         },
       );
     } else {
