@@ -2,7 +2,7 @@ import {
     ArrowUturnLeftIcon,
     FolderIcon
 } from "@heroicons/react/20/solid";
-import { config } from "@/config";
+import config  from "@/config";
 import { useEffect, useState } from "react";
 import { IProcess } from "../interfaces/process";
 import Dropdown from "../../tests/components/Dropdown";

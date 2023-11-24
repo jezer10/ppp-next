@@ -18,20 +18,35 @@ import ProcessWelcomeModal from "./components/ProcessWelcomeModal";
 import ProcessTypeSelection from "./components/ProcessTypeSelection";
 const maxSize = 1024 * 1024 * 5;
 const maxFiles = 1;
-const percentage = 25;
 function Page() {
   const { user } = useInformation();
+  const [statusPercentage, setStatusPercentage] = useState(0);
   const [selectedStage, setSelectedStage] = useState<any>(null);
   const [stageTypes, setStageTypes] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
   const [uploadCounter, setUploadCounter] = useState(0);
-  const onDrop = useCallback((acceptedFiles: any) => {
-    setSelectedFiles(acceptedFiles);
-  }, []);
+  const [selectedProcess, setSelectedProcess] = useState<any>(null);
+  const onDrop = useCallback(
+    (acceptedFiles: any) => {
+      const [file] = acceptedFiles;
+      if (file) {
+        console.log(selectedStage);
+        const changingData = {
+          ...selectedStage,
+          file,
+        };
+        console.log(changingData);
+        setSelectedStage(changingData);
+      }
+    },
+    [selectedStage],
+  );
 
   const deleteFiles = () => {
-    setSelectedFiles([]);
+    setSelectedStage({
+      ...selectedStage,
+      file: null,
+    });
   };
 
   useEffect(() => {
@@ -41,11 +56,32 @@ function Page() {
           `${config.BACK_URL}/process/stages/${user?.user_id}`,
         );
         const { data } = await response.json();
-        setSelectedStage(data[0]);
+        setStatusPercentage(
+          Math.round(
+            (data.filter((e: any) => e?.step_id).length / data.length) * 100,
+          ),
+        );
         setStageTypes(data);
+        if (stageTypes.length > 0) {
+          stageChange(0);
+        }
       }
     }
     getStageTypes();
+  }, [user?.user_id, stageTypes.length]);
+
+  useEffect(() => {
+    async function fetchProcess() {
+      if (user?.user_id) {
+        const response = await fetch(
+          `${config.BACK_URL}/process/student/${user?.user_id}`,
+          {},
+        );
+        const { data } = await response.json();
+        setSelectedProcess(data);
+      }
+    }
+    fetchProcess();
   }, [user?.user_id]);
 
   const onDropRejected = useCallback((files: any, event: any) => {
@@ -79,45 +115,72 @@ function Page() {
   });
 
   const uploadFile = async () => {
-    setIsUploading(true);
-    const [file] = selectedFiles;
-    const fileRef = ref(storage, file.name);
-    const uploadTask = uploadBytesResumable(fileRef, file);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        setUploadCounter(
-          Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100),
-        );
-      },
-      (error) => {
-        console.log(error);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(fileRef);
-        console.log(downloadURL);
-        setIsUploading(false);
-        toast.success("Archivo subido correctamente");
-      },
-    );
+    const { file, type_id } = selectedStage;
+    const { process_id } = selectedProcess;
+    const body = {
+      process_id,
+      type_id,
+      path: file.path,
+      filename: file.name,
+    };
+    console.log(body);
+    if (file instanceof File) {
+      setIsUploading(true);
+      const fileRef = ref(storage, file.name);
+      const uploadTask = uploadBytesResumable(fileRef, file);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          setUploadCounter(
+            Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100),
+          );
+        },
+        (error) => {
+          console.log(error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(fileRef);
+          console.log(downloadURL);
+          const response = await fetch(`${config.BACK_URL}/process/stage`, {
+            method: "POST",
+            body: JSON.stringify({
+              process_id: selectedStage?.process_id,
+            }),
+          });
+          setIsUploading(false);
+          toast.success("Archivo subido correctamente");
+        },
+      );
+    } else {
+      toast.error("No se ha seleccionado un archivo");
+    }
   };
 
   function fileViewOpen() {
+    console.log(selectedStage?.path);
     window.open(selectedStage?.path);
+  }
+
+  async function stageChange(idx: number) {
+    const stage = stageTypes[idx];
+    console.log(stage);
+    const { path, filename, ...rest } = stage;
+    const staging = { ...rest, file: { path, name: filename } };
+    setSelectedStage(staging);
   }
   return (
     <div className="flex flex-col gap-8 rounded-lg  bg-white p-8 md:h-full md:flex-row md:divide-x">
       <div className="flex w-full flex-col items-center justify-center gap-6 md:w-1/4">
         <div className="h-20 w-20">
           <CircularProgressbarWithChildren
-            value={percentage}
+            value={statusPercentage}
             styles={buildStyles({
               pathColor: "#FF9853",
             })}
           >
             <span
               className={`font-bold  text-[#757575]`}
-            >{`${percentage}%`}</span>
+            >{`${statusPercentage}%`}</span>
           </CircularProgressbarWithChildren>
         </div>
         <div className="relative">
@@ -143,7 +206,7 @@ function Page() {
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelectedStage(e)}
+                  onClick={() => stageChange(index)}
                   className={`${
                     e?.state ? "text-[#FF9853]" : "text-[#757575]"
                   } rounded-xl px-4 py-2  font-sans text-sm font-medium hover:bg-gray-200 disabled:hover:bg-none`}
@@ -178,7 +241,7 @@ function Page() {
               </div>
             </div>
             <div className=" flex flex-col gap-8">
-              {!selectedStage?.path ? (
+              {!selectedStage?.file?.path ? (
                 <div
                   {...getRootProps()}
                   className=" flex shrink-0 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[#ff9853] py-12 "
@@ -211,7 +274,7 @@ function Page() {
                         isUploading ? "text-xs font-light" : "text-sm font-bold"
                       }`}
                     >
-                      {selectedStage?.filename}
+                      {selectedStage?.file?.name ?? "-"}
                     </div>
                     {isUploading && (
                       <div className="flex flex-col self-stretch rounded-lg bg-[#ececec]">
@@ -224,14 +287,14 @@ function Page() {
                       </div>
                     )}
                   </div>
-                  {
+                  {!(selectedStage?.file instanceof File) && (
                     <button
                       onClick={fileViewOpen}
                       className="h-8 w-8 flex-none rounded-full p-2 text-yellow-600 hover:bg-gray-200"
                     >
                       <EyeIcon />
                     </button>
-                  }
+                  )}
                   {isUploading ? (
                     <div className=" font-sans text-xl font-light text-[#757575]">
                       {`${uploadCounter}%`}
@@ -239,7 +302,7 @@ function Page() {
                   ) : (
                     selectedStage?.status != 1 && (
                       <button
-                        onClick={deleteFiles}
+                        onClick={() => deleteFiles()}
                         className="h-8 w-8 flex-none rounded-full p-2 text-red-500 hover:bg-gray-200"
                       >
                         <TrashIcon />
@@ -272,7 +335,7 @@ function Page() {
           <button
             onClick={uploadFile}
             className="rounded-lg bg-[#ff9853] py-2 text-center font-sans text-xs font-bold text-white disabled:bg-gray-200"
-            disabled={isUploading || selectedFiles.length == 0}
+            disabled={isUploading || !(selectedStage?.file instanceof File)}
           >
             Enviar
           </button>

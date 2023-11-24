@@ -67,7 +67,7 @@ const Home = () => {
           priority={true}
           className="absolute right-28 -z-10 h-full w-auto"
         />
-        <div className="flex gap-4">
+        <div className=" hidden md:flex gap-4  ">
           <div className="h-full w-56">
             <div className="px-12 py-8">
               <Image
@@ -109,7 +109,7 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-0 right-0 top-0 flex h-full w-1/2 items-center justify-center">
+        <div className="absolute bottom-0 right-0 top-0 flex h-full w-full md:w-1/2 items-center justify-center">
           <div className="flex max-w-xs flex-col gap-4">
             <div className="text-center  text-[#0F3971] ">
               <div className="text-2xl font-bold">Iniciar Sesión</div>

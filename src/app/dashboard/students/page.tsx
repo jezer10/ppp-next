@@ -6,18 +6,11 @@ import {
   ChevronLeftIcon,
   ChevronDownIcon,
   IdentificationIcon,
-<<<<<<< HEAD
   UserGroupIcon,
-  TrashIcon,
-=======
   DocumentIcon,
-  UserGroupIcon,
   EyeIcon,
->>>>>>> 78f1da7ad979950bdd48b7a41d6a104f8003d78d
   UserIcon,
   ClockIcon,
-  DocumentIcon,
-  EyeIcon
 } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useState } from "react";
@@ -301,7 +294,7 @@ export default function Students() {
             </button>
           </div>
 
-          <div className="w-full overflow-x-auto">
+          <div className="">
             <div className="flex flex-col gap-4 ">
               <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-3 text-left text-[0.6875rem] font-medium text-[#757575]">
                 <div>Código</div>
@@ -330,11 +323,15 @@ export default function Students() {
                       className="rounded-[0.625rem] bg-[#D1D1D1] "
                     >
                       <div className="grid grid-cols-8 items-center rounded-[0.625rem] bg-white px-4 py-6 text-left text-[0.625rem] font-normal text-[#C4C4C4] shadow ">
-                        <div className="whitespace-nowrap">{item.Estudiante.code}</div>
+                        <div className="whitespace-nowrap">
+                          {item.Estudiante.code}
+                        </div>
                         <div className="whitespace-nowrap">
                           {`${item.Estudiante.Persona.name} ${item.Estudiante.Persona.surname}`}
                         </div>
-                        <div className="whitespace-nowrap">{item.Estudiante.School.name}</div>
+                        <div className="whitespace-nowrap">
+                          {item.Estudiante.School.name}
+                        </div>
                         <div className="whitespace-nowrap">
                           {intToRoman(Number(item.Estudiante.Cycle.cycle))}
                         </div>
@@ -343,7 +340,7 @@ export default function Students() {
                             status={Number(item.Estudiante.state)}
                           />
                         </div>
-                        <div  className="flex items-center gap-2 whitespace-nowrap">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
                           <UserIcon className="h-4 w-4" />
                           {`${item.Supervisor.Docente.Persona.name} ${item.Supervisor.Docente.Persona.surname}`}
                         </div>
